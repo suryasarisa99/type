@@ -8,7 +8,7 @@ import facts from "../facts.json"
 import { DataContext } from "../context/DataContext";
 import { motion } from 'framer-motion'
 import Typos from "../components/Typos";
-export default function TextBox({ goSettings }) {
+export default function TextBox({ goSettings, goThemes }) {
     const { limit, setLimit, allTypos, setAllTypos, settState: opt, mistakes, setMistakes } = useContext(DataContext)
     // localStorage.clear();
     let [arr, setArr] = useState(!opt.random ? getWords({ len: limit }) : randomWords({ len: limit }))
@@ -60,6 +60,11 @@ export default function TextBox({ goSettings }) {
         if (e.altKey && e.key == 'i') {
             goSettings();
             return;
+        }
+        if (e.altKey && e.key == 'o') {
+            goThemes();
+            return;
+
         }
         if (doneRef.current) {
             if (e.key == " ")

@@ -22,6 +22,7 @@
   --slash-color: rgba(48, 48, 48, 0.596);
   --wpm-color: #b8b8b8;
   --info-color: rgba(58, 58, 58, 0.516);
+  --selected-word-limit: rgb(228, 228, 228);
 
   // --body-image: linear-gradient(
   //   135deg,
@@ -43,60 +44,65 @@
   // --wrong-char: #d73811;
   // --wrong-char-bg: transparent;
   // --typo-char: rgb(85, 85, 85);
+}
 
-  // burgundy
-  // --body-color: #1a1a1a;
-  // --accent-color: rgb(19, 20, 21);
-  // --background-color: #5b1a21;
-  // --input-color: #6a2128;
-  // --text-color: rgb(255, 255, 255);
-  // --current-char: #ffb701;
-  // --current-char-bg: transparent;
-  // --true-char: #68b723;
-  // --true-char-bg: transparent;
-  // --wrong-char: #c6262e;
-  // --wrong-char-bg: transparent;
-  // --typo-char: rgb(85, 85, 85);
-  // --words-limit-color: rgb(133, 7, 7);
-  // --wpm-color: #983434;
-  // --info-color: rgba(98, 52, 58, 0.823);
+.burgundy {
+  --body-color: #1a1a1a;
+  --accent-color: rgb(19, 20, 21);
+  --background-color: #5b1a21;
+  --input-color: #6a2128;
+  --text-color: rgb(255, 255, 255);
+  --current-char: #ffb701;
+  --current-char-bg: transparent;
+  --true-char: #68b723;
+  --true-char-bg: transparent;
+  --wrong-char: #c6262e;
+  --wrong-char-bg: transparent;
+  --typo-char: rgb(85, 85, 85);
+  --words-limit-color: rgb(133, 7, 7);
+  --wpm-color: #983434;
+  --info-color: rgba(98, 52, 58, 0.823);
+  --selected-word-limit: rgb(241, 0, 0);
+}
 
-  // monoai
-  // --body-color: #171812;
-  // --background-color: #2f3225;
-  // --text-color: #f8f8f2;
-  // --accent-color: #a6e22e;
-  // --current-char: #66d9ef;
-  // --current-char-bg: #2f3524cf;
-  // --true-char: #a6e22e;
-  // --true-char-bg: transparent;
-  // --wrong-char: #f92672;
-  // --wrong-char-bg: transparent;
-  // --typo-char: rgb(255, 172, 7);
-  // --slash-color: var(--true-char);
-  // --words-limit-color: var(--true-char);
-  // --input-color: #363a2a;
-  // --wpm-color: var(--accent-color);
-  // --info-color: #5d6d35;
-
-  // dots
-  // --body-color: #191b25;
-  // --background-color: #232533;
-  // --input-color: #2b2d3c;
-  // --text-color: #dcdcdc;
-  // --accent-color: rgb(255, 172, 7);
-  // --current-char: #9b57ff;
-  // --current-char-bg: #2f3524cf;
-  // --true-char: #32cb8b;
-  // --true-char-bg: transparent;
-  // --wrong-char: #fe494e;
-  // --wrong-char-bg: transparent;
-  // --typo-char: rgb(255, 172, 7);
-  // --slash-color: var(--true-char);
-  // --words-limit-color: #ff9552;
-  // --slash-color: var(--words-limit-color);
-  // --wpm-color: #ffd751;
-  // --info-color: rgba(50, 59, 103, 0.823);
+.monokai {
+  --body-color: #171812;
+  --background-color: #2f3225;
+  --text-color: #f8f8f2;
+  --accent-color: #a6e22e;
+  --current-char: #66d9ef;
+  --current-char-bg: #2f3524cf;
+  --true-char: #a6e22e;
+  --true-char-bg: transparent;
+  --wrong-char: #f92672;
+  --wrong-char-bg: transparent;
+  --typo-char: rgb(255, 172, 7);
+  --slash-color: var(--true-char);
+  --words-limit-color: var(--true-char);
+  --input-color: #363a2a;
+  --wpm-color: var(--accent-color);
+  --info-color: #5d6d35;
+  --selected-word-limit: rgb(239, 243, 0);
+}
+.dots {
+  --body-color: #191b25;
+  --background-color: #232533;
+  --input-color: #2b2d3c;
+  --text-color: #dcdcdc;
+  --accent-color: rgb(255, 172, 7);
+  --current-char: #9b57ff;
+  --current-char-bg: #2f3524cf;
+  --true-char: #32cb8b;
+  --true-char-bg: transparent;
+  --wrong-char: #fe494e;
+  --wrong-char-bg: transparent;
+  --typo-char: rgb(255, 172, 7);
+  --slash-color: var(--true-char);
+  --words-limit-color: #ff9552;
+  --slash-color: var(--words-limit-color);
+  --wpm-color: #ffd751;
+  --info-color: rgba(50, 59, 103, 0.823);
+  --selected-word-limit: rgb(255, 94, 0);
 }
 @keyframes Gradient {
   0% {
@@ -375,7 +381,7 @@ form {
   display: flex;
   gap: 5px;
   .word-limit.selected p {
-    color: white;
+    color: var(--selected-word-limit);
     // text-decoration: underline 1.5px white;
   }
 
@@ -417,7 +423,7 @@ form {
 // @typos
 
 .typos {
-  background-color: rgb(26, 27, 29);
+  background-color: var(--background-color);
   margin-top: 15px;
   padding: 12px 20px;
   width: fit-content;
@@ -430,7 +436,8 @@ form {
 
   button {
     color: #c6d8ff;
-    background-color: rgb(45, 47, 52);
+    // background-color: rgb(45, 47, 52);
+    background-color: var(--input-color);
     border: none;
     border-radius: 6px;
     padding: 2px 4px;
@@ -495,4 +502,9 @@ form {
   &:focus {
     outline: 0;
   }
+}
+
+// @themes
+.themes-page {
+  background-color: red;
 }
