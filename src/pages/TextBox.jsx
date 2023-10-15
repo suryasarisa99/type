@@ -1,14 +1,17 @@
 import { useState, useEffect, useRef, useContext, useCallback } from "react";
-import w10k from "../words.json";
+import threeL from "../3l.json";
 import w200 from "../w-200.json";
 import w1000 from "../w-1000.json";
 import meanings from "../merge.json"
+import names from "../names.json"
+import facts from "../facts.json"
 import { DataContext } from "../context/DataContext";
 import { motion } from 'framer-motion'
-export default function TextBox({ settState: opt, goSettings }) {
-    const { limit, setLimit } = useContext(DataContext)
-
-    let [arr, setArr] = useState(!opt.random ? getWords(limit) : randomWords(limit))
+import Typos from "../components/Typos";
+export default function TextBox({ goSettings }) {
+    const { limit, setLimit, allTypos, setAllTypos, settState: opt, mistakes, setMistakes } = useContext(DataContext)
+    // localStorage.clear();
+    let [arr, setArr] = useState(!opt.random ? getWords({ len: limit }) : randomWords({ len: limit }))
     // let [arr, setArr] = useState(randomWords(35, "char"))
     let cc = useRef(0)
     let cw = useRef(0)
@@ -16,21 +19,22 @@ export default function TextBox({ settState: opt, goSettings }) {
     let chars = useRef(null);
     let charLen = useRef(null);
     let wordsLen = useRef(null);
-    let wordsLimits = useRef([15, 30, 45, 60, 80, 100, 150])
+    let wordsLimits = useRef([8, 15, 30, 45, 60, 80, 100]);
+    let mistakesRef = useRef({});
 
     let textBoxRef = useRef(null);
     const [inCorrectChars, setInCorrectChars] = useState([])
+    const typos = useRef([]);
     const timer = useRef({ m: 0, s: 0 });
     const timerRef = useRef(null);
     let [wpm, setWpm] = useState(0);
     let prvError = useRef(false);
-    // let [startTimer, setStartTimer] = useState(false)
     let [done, setDone] = useState(false);
     let doneRef = useRef(false);
 
     const changeLimit = (val) => {
         setLimit(val);
-        reset(val);
+        reset({ len: val });
         localStorage.setItem('limit', val);
     }
 
@@ -38,8 +42,18 @@ export default function TextBox({ settState: opt, goSettings }) {
     const handleKeyDown = useCallback((e) => {
         const nexWordFirstchar = words.current?.[cw.current + 1]?.querySelector('.char');
 
+        // * @backspace  <------
+        if (e.key == 'Backspace') {
+            if (cc.current == 0) return;
+            chars.current[cc.current].classList.remove('current')
+            cc.current -= 1;
+            chars.current[cc.current].classList.add('current')
+            chars.current[cc.current].classList.remove('wrong')
+            chars.current[cc.current].classList.remove('true')
+            return;
+        }
         // handle Keys
-        if (e.key == "Alt" || e.key == "Shift" || e.ctrlKey || e.key == "CapsLock") return;
+        if (e.key.length > 1) return;
         let key = e.key;
         if (e.altKey && e.key == 'i') {
             goSettings();
@@ -47,22 +61,13 @@ export default function TextBox({ settState: opt, goSettings }) {
         }
         if (doneRef.current) {
             if (e.key == " ")
-                reset();
+                reset({});
             return;
         }
         if (e.shiftKey)
             key = e.key.toUpperCase();
 
-        // * @backspace  <------
-        if (e.key == 'Backspace') {
-            if (cc.current == 0) return;
-            chars[cc.current].classList.remove('current')
-            cc.current -= 1;
-            chars[cc.current].classList.add('current')
-            chars[cc.current].classList.remove('wrong')
-            chars[cc.current].classList.remove('true')
-            return;
-        }
+
 
         // @first-Letter
         if (cw.current == 0 && cc.current == 0) {
@@ -74,13 +79,17 @@ export default function TextBox({ settState: opt, goSettings }) {
             chars.current[cc.current].classList.remove('current');
             chars.current[cc.current].classList.add('true')
 
+            // * @end
             if (cw.current == arr.length - 1 && cc.current == arr[arr.length - 1].length) {
                 setDone(true);
                 doneRef.current = true;
                 clearInterval(timerRef.current)
                 const seconds = (timer.current.m * 60) + (+timer.current.s);
+                addToAllTypos(typos.current);
                 setWpm(parseInt(cw.current / (seconds / 60)))
+                mergeMistakes(mistakesRef.current)
                 return;
+
             }
 
             cc.current = 0;
@@ -114,6 +123,10 @@ export default function TextBox({ settState: opt, goSettings }) {
             curChar.classList.add('wrong');
             curChar.classList.remove('current');
             prvError.current = true;
+            if (arr[cw.current]?.[cc.current + 1] != key && key != ' ') {
+                typos.current.push({ a: arr[cw.current][cc.current], b: key, word: arr[cw.current], index: cc.current })
+                addMistake(mistakesRef.current, arr[cw.current][cc.current])
+            }
 
             const xElm = document.createElement('span');
             xElm.textContent = key;
@@ -130,7 +143,7 @@ export default function TextBox({ settState: opt, goSettings }) {
         words.current = document.querySelectorAll('.word');
         chars.current = words.current[0].querySelectorAll('.char');
         wordsLen.current = arr.length;
-        charLen.current = arr.map(w => w.length);
+        // charLen.current = arr.map(w => w.length);
     }, [])
 
     useEffect(() => {
@@ -141,7 +154,25 @@ export default function TextBox({ settState: opt, goSettings }) {
         }
     }, [handleKeyDown])
 
+    const addMistake = (arr, mistake) => {
+        if (mistake in arr)
+            arr[mistake]++;
+        else arr[mistake] = 1;
+    }
+
+    const mergeMistakes = (source) => {
+        Object.entries(source).map(([key, value]) => {
+            if (key in mistakes)
+                mistakes[key] += value;
+            else mistakes[key] = value;
+        })
+        setMistakes({ ...mistakes })
+        localStorage.setItem('mistakes', JSON.stringify(mistakes))
+    }
+
     function startTime() {
+        if (timerRef.current)
+            clearInterval(timerRef.current)
         timerRef.current = setInterval(() => {
             if (timer.current.s < 59)
                 timer.current = { m: timer.current.m, s: timer.current.s + 1 }
@@ -149,10 +180,12 @@ export default function TextBox({ settState: opt, goSettings }) {
                 timer.current = { m: timer.current.m + 1, s: 0 }
         }, 1000)
     }
-    const reset = (val) => {
-        setArr(!opt.random ? getWords(val || limit) : randomWords(val || limit))
+    const reset = ({ len, all }) => {
+        setArr(!opt.random ? getWords({ len: len || limit, all }) : randomWords({ len: len || limit, all }))
         cw.current = 0;
         cc.current = 0;
+        typos.current = [];
+        mistakesRef.current = {};
         setDone(false);
         doneRef.current = false;
         setTimeout(() => {
@@ -175,46 +208,80 @@ export default function TextBox({ settState: opt, goSettings }) {
         });
         return isMatch;
     }
-    function getWords(len) {
+    function getWords({ len, all }) {
         let data;
         switch (opt.data) {
-            case '10k': data = w10k; break;
+            case '3l': data = threeL.slice(0, 10000); break;
             case '200': data = w200; break;
             case '1k': data = w1000; break;
-            case "meanings": data = meanings.map(item => item.name); break;
+            case 'names': data = names; break;
+            case "meanings": data = meanings; break;
+            case "facts": data = facts; break;
         }
-        const smallWords = data.filter(word =>
+        let smallWords;
+        if (opt.data == 'meanings') {
+            smallWords = data.filter(word => {
+                // console.log(word);
+                return (!word.name.includes('z')
+                    && word.name.length >= opt.min
+                    && word.name.length <= opt.max
+                    && (opt.any.length > 0 ? opt.any.some(ch => word.name.includes(ch)) : true)
+                    && (all || opt.all).every(ch => word.name.includes(ch))
+                    && opt.none.every(ch => !word.name.includes(ch)))
+            }
+            )
+        } else
+            smallWords = data.filter(word =>
+                !word.includes('z')
+                && word.length >= opt.min
+                && word.length <= opt.max
+                && (opt.any.length > 0 ? opt.any.some(ch => word.includes(ch)) : true)
+                && (all || opt.all).every(ch => word.includes(ch))
+                && opt.none.every(ch => !word.includes(ch))
+            )
+        const filterFacts = facts.filter(item => item.split(' ').length <= len)
 
-            !word.includes('z')
-            && word.length >= opt.min
-            && word.length <= opt.max
-            && (opt.any.length > 0 ? opt.any.some(ch => word.includes(ch)) : true)
-            && opt.all.every(ch => word.includes(ch))
-            && opt.none.every(ch => !word.includes(ch))
-
-        )
         const limit = smallWords.length;
         let i = 0;
-        const randomWords = []
+        let randomWords = []
         while (i < len) {
-            randomWords.push(smallWords[parseInt(Math.random() * limit)]?.toLowerCase());
-            i++;
+            if (opt.data == "meanings") {
+                let item = smallWords[parseInt(Math.random() * limit)];
+                randomWords.push(item.name + ":");
+                let words = item.text.split(' ');
+                words[words.length - 1] += "."
+                i += words.length + 1;
+                if (i > len) break;
+                randomWords = [...randomWords, ...words]
+            } else if (opt.data == "facts") {
+                console.log(`len: ${len}`);
+                // console.log(filterFacts)
+                let factWords = filterFacts[parseInt(Math.random() * filterFacts.length)].split(' ')
+                console.log(factWords)
+                i += factWords.length;
+                if (randomWords.length != 0 && i > len) break;
+                randomWords = [...randomWords, ...factWords]
+
+            } else {
+                randomWords.push(smallWords[parseInt(Math.random() * limit)]);
+                i++;
+            }
         }
         return randomWords;
     }
-    function randomWords(len, type) {
+    function randomWords({ len, type, all }) {
 
         let i = 0;
         let list = []
         while (i < len) {
-            list.push(makeWord(type))
+            list.push(makeWord({ type, all }))
             i++;
         }
         return list;
     }
 
-    function makeWord(type) {
-        let word = opt.all.join('');
+    function makeWord({ type, all }) {
+        let word = all?.join('') || opt.all.join('');
 
         if (opt.any.length > 0) {
             let randomIndex = randomRange(0, opt.any.length);
@@ -239,25 +306,43 @@ export default function TextBox({ settState: opt, goSettings }) {
 
         return word.shuffle();
     }
+    function addToAllTypos(typos) {
+        typos.forEach(item => {
+            let obj = allTypos.find(nItem => nItem.a == item.a && nItem.b == item.b)
+            if (obj) {
+                obj.count += 1;
+                obj.items.push({ word: item.word, index: item.index })
+            } else {
+                allTypos.push(
+                    { a: item.a, b: item.b, items: [{ word: item.word, index: item.index }], count: 1 }
+                )
+            }
+
+        })
+        setAllTypos([...allTypos.sort((x, y) => y.count - x.count)]);
+        localStorage.setItem('typos', JSON.stringify(allTypos))
+    }
 
     return (
         <motion.div
             initial={{ y: -1000 }}
             animate={{ y: 0 }}
             exit={{ y: 1000 }}
+            className="textbox"
         >
             <div className="top-row">
+                {/* <input type="text" style={{ visibility: 'hidden' }} autoFocus /> */}
                 <div className="word-limits">
                     {
-                        wordsLimits.current.map(len => (
-                            <div key={len} className="word-limit">
+                        wordsLimits.current.map((len, index) => (
+                            <div key={len} className={"word-limit " + (len == limit ? "selected" : "")}>
                                 <p onClick={() => changeLimit(len)} >{len}</p>
                                 <div className="slash">/</div>
                             </div>
                         ))
                     }
                 </div>
-                <p >{done && `wpm: ${wpm}`}</p>
+                <p className="wpm" >{done && `WPM: ${wpm}`}</p>
 
             </div>
             <div className="box" ref={textBoxRef}>
@@ -265,7 +350,7 @@ export default function TextBox({ settState: opt, goSettings }) {
                 {arr.map((word, ind) => (
 
                     <div key={`${word}-x-x-${ind}`} className="word">
-                        {word.split('').map((ch, index) => {
+                        {word?.split('')?.map((ch, index) => {
                             return <div key={`${word}-${ch}-${ind}-${index}`}>
                                 <p className="char"> {ch}</p>
                                 {word.length - 1 == index && <span className="char ws" key={"space" + ind}> </span>}
@@ -277,6 +362,24 @@ export default function TextBox({ settState: opt, goSettings }) {
             </div>
             {done && <p className="info">Press space to try again </p>}
             {/* <button onClick={goSettings}>settings</button> */}
+            {done &&
+                <>
+                    <span>{timer.current.m}</span>
+                    :
+                    <span>{timer.current.s}</span>
+                </>
+            }
+            {<Typos typos={allTypos} reset={reset} />}
+            {/* <div className="typos-boxes"> */}
+            {/* {done && <Typos typos={mergeTypos(typos.current)} />} */}
+            {/* </div> */}
+            {/* <div className="mistakes">
+                {Object.entries(mistakes).map(([key, value]) => {
+                    return <div key={key}>
+                        <span>{key}</span> <span>{value}</span>
+                    </div>
+                })}
+            </div> */}
         </motion.div>
 
     );
@@ -294,6 +397,23 @@ const randNum = () => numbers[parseInt(Math.random() * numbers.length)]
 const randSym = () => symbols[parseInt(Math.random() * symbols.length)]
 
 
+
+function mergeTypos(typos) {
+    let arr = [];
+    typos.forEach(item => {
+        let obj = arr.find(nItem => nItem.a == item.a && nItem.b == item.b)
+        if (obj) {
+            obj.count += 1;
+            obj.items.push({ word: item.word, index: item.index })
+        } else {
+            arr.push(
+                { a: item.a, b: item.b, items: [{ word: item.word, index: item.index }], count: 1 }
+            )
+        }
+
+    })
+    return arr;
+}
 
 
 

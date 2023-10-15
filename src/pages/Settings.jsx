@@ -1,7 +1,11 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useContext } from 'react'
 import { FaChevronCircleLeft } from 'react-icons/fa';
-import { motion } from 'framer-motion'
-export default function Settings({ settState: opt, dSett, back }) {
+import { motion } from 'framer-motion';
+import { DataContext } from '../context/DataContext';
+
+export default function Settings({ back }) {
+    const { settState: opt, dSett } = useContext(DataContext)
+
     let [min, setMin] = useState(opt.min);
     let [max, setMax] = useState(opt.max);
     let [all, setAll] = useState(opt.all.join(''));
@@ -42,9 +46,11 @@ export default function Settings({ settState: opt, dSett, back }) {
         // transition={{ delay: 0.3 }}
         // whileInView={()=>{}}
         >
-            {/* <button type="button" onClick={back}> */}
+            {/* <button type="button" className='back-outer' onClick={back}>
+                <FaChevronCircleLeft className="back" />
+            </button> */}
             <FaChevronCircleLeft className="back" onClick={back} />
-            {/* </button> */}
+
 
             <div className="forms">
 
@@ -64,7 +70,7 @@ export default function Settings({ settState: opt, dSett, back }) {
                     }
 
                     dSett({
-                        type: 'all',
+                        type: '',
                         payload: options
                     })
 
@@ -112,25 +118,37 @@ export default function Settings({ settState: opt, dSett, back }) {
                             <p>1k Words</p>
                         </div>
                         <div className="row-sb">
-                            <input type="radio" checked={data == "10k"} name="data" value="10k" onChange={(e) => setNonRandom(e)} />
-                            <p>10k Words</p>
+                            <input type="radio" checked={data == "3l"} name="data" value="3l" onChange={(e) => setNonRandom(e)} />
+                            <p>3l Words</p>
                         </div>
 
-                        {/* <div className="row-sb">
+
+                    </div>
+                    <div className="radio-row">
+                        <div className="row-sb">
                             <input type="radio" name="data" checked={data == "meanings"} value="meanings" onChange={e => setNonRandom(e)} />
                             <p>meanings</p>
-                        </div> */}
+                        </div>
+                        <div className="row-sb">
+                            <input type="radio" name="data" checked={data == "names"} value="names" onChange={e => setNonRandom(e)} />
+                            <p>Names</p>
+                        </div>
+                        <div className="row-sb">
+                            <input type="radio" name="data" checked={data == "facts"} value="facts" onChange={e => setNonRandom(e)} />
+                            <p>Facts</p>
+                        </div>
+
                     </div>
-                    <p>Random</p>
+                    <p className='radio-row'>Random</p>
                     <div className="radio-row">
                         <div className="row-sb">
                             <input type="radio" checked={data == "char"} name="data" value="char" onChange={(e) => setRandomType(e)} />
                             <p>chars</p>
                         </div>
-                        <div className="row-sb">
+                        {/* <div className="row-sb">
                             <input type="radio" checked={data == "cap"} name="data" value="cap" onChange={(e) => setRandomType(e)} />
                             <p>capital</p>
-                        </div>
+                        </div> */}
                         <div className="row-sb">
                             <input type="radio" checked={data == "num"} name="data" value="num" onChange={(e) => setRandomType(e)} />
                             <p>numbers</p>

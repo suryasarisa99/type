@@ -1,13 +1,35 @@
-import { createContext, useState, useEffect } from 'react'
+import { createContext, useState, useEffect, useReducer } from 'react'
 
 
 const DataContext = createContext();
 export default function DataProvider({ children }) {
     const [limit, setLimit] = useState(JSON.parse(localStorage.getItem('limit')) || 45)
+    const [allTypos, setAllTypos] = useState(JSON.parse(localStorage.getItem('typos')) || [])
+    const [mistakes, setMistakes] = useState(JSON.parse(localStorage.getItem('mistakes')) || {})
+    function reducer(state, action) {
+        if (action.type == "") return action.payload;
+        else
+            return { ...state, [action.type]: action.payload }
+    }
+    // localStorage.clear();
+    const [settState, dSett] = useReducer(reducer,
+        JSON.parse(
+            localStorage.getItem('options')
+        ) ||
+        {
+            min: 3,
+            max: 5,
+            all: [],
+            any: [],
+            none: [],
+            random: false,
+            type: 'char',
+            data: "200"
+        })
 
     return (
         <DataContext.Provider value={{
-            limit, setLimit
+            limit, setLimit, allTypos, setAllTypos, settState, dSett, mistakes, setMistakes
         }}>
             {children}
         </DataContext.Provider>
