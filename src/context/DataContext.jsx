@@ -24,12 +24,13 @@ export default function DataProvider({ children }) {
             none: [],
             random: false,
             type: 'char',
-            data: "200"
+            data: "200",
+            complexity: 5,
         })
 
     return (
         <DataContext.Provider value={{
-            limit, setLimit, allTypos, setAllTypos, settState, dSett, mistakes, setMistakes
+            limit, setLimit, allTypos, setAllTypos, settState, dSett, mistakes, setMistakes,
         }}>
             {children}
         </DataContext.Provider>

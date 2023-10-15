@@ -6,12 +6,14 @@ import { DataContext } from '../context/DataContext';
 export default function Settings({ back }) {
     const { settState: opt, dSett } = useContext(DataContext)
 
-    let [min, setMin] = useState(opt.min);
-    let [max, setMax] = useState(opt.max);
-    let [all, setAll] = useState(opt.all.join(''));
-    let [any, setAny] = useState(opt.any.join(''));
-    let [none, setNone] = useState(opt.none.join(''));
-    let [data, setData] = useState(opt.data);
+    const [min, setMin] = useState(opt.min);
+    const [max, setMax] = useState(opt.max);
+    const [all, setAll] = useState(opt.all.join(''));
+    const [any, setAny] = useState(opt.any.join(''));
+    const [none, setNone] = useState(opt.none.join(''));
+    const [data, setData] = useState(opt.data);
+    const [complexity, setComplexity] = useState(opt.complexity);
+
     let [random, setRandom] = useState(opt.random);
     function setNonRandom(e) {
         setRandom(false);
@@ -65,8 +67,9 @@ export default function Settings({ back }) {
                         all: all.split(''),
                         any: any.split(''),
                         none: none.split(''),
-                        data: data,
-                        random: random,
+                        data,
+                        random,
+                        complexity: +complexity
                     }
 
                     dSett({
@@ -118,14 +121,6 @@ export default function Settings({ back }) {
                             <p>1k Words</p>
                         </div>
                         <div className="row-sb">
-                            <input type="radio" checked={data == "3l"} name="data" value="3l" onChange={(e) => setNonRandom(e)} />
-                            <p>3l Words</p>
-                        </div>
-
-
-                    </div>
-                    <div className="radio-row">
-                        <div className="row-sb">
                             <input type="radio" name="data" checked={data == "meanings"} value="meanings" onChange={e => setNonRandom(e)} />
                             <p>meanings</p>
                         </div>
@@ -137,6 +132,17 @@ export default function Settings({ back }) {
                             <input type="radio" name="data" checked={data == "facts"} value="facts" onChange={e => setNonRandom(e)} />
                             <p>Facts</p>
                         </div>
+
+                    </div>
+                    <div className="radio-row">
+                        <input type="radio" checked={data == "3l"} name="data" value="3l" onChange={(e) => setNonRandom(e)} />
+                        <p>3 lack+ Words</p>
+                        <div className="row">
+                            <span>frequent</span> <input type="range" min={0} max={19} value={complexity} disabled={data != "3l"} onChange={e => setComplexity(e.target.value)} /> <span>Infrequent</span>
+                        </div>
+                    </div>
+                    <div className="radio-row">
+
 
                     </div>
                     <p className='radio-row'>Random</p>

@@ -22,6 +22,8 @@ export default function TextBox({ goSettings }) {
     let wordsLimits = useRef([8, 15, 30, 45, 60, 80, 100]);
     let mistakesRef = useRef({});
 
+    const hiddenInputRef = useRef(null);
+
     let textBoxRef = useRef(null);
     const [inCorrectChars, setInCorrectChars] = useState([])
     const typos = useRef([]);
@@ -186,6 +188,8 @@ export default function TextBox({ goSettings }) {
         cc.current = 0;
         typos.current = [];
         mistakesRef.current = {};
+        hiddenInputRef.current.focus();
+        hiddenInputRef.current.value = ""
         setDone(false);
         doneRef.current = false;
         setTimeout(() => {
@@ -211,13 +215,14 @@ export default function TextBox({ goSettings }) {
     function getWords({ len, all }) {
         let data;
         switch (opt.data) {
-            case '3l': data = threeL.slice(0, 10000); break;
+            case '3l': data = threeL.slice(0, sliceAt(opt.complexity)); break;
             case '200': data = w200; break;
             case '1k': data = w1000; break;
             case 'names': data = names; break;
             case "meanings": data = meanings; break;
             case "facts": data = facts; break;
         }
+        console.log(`data len: ${data.length}`)
         let smallWords;
         if (opt.data == 'meanings') {
             smallWords = data.filter(word => {
@@ -331,7 +336,6 @@ export default function TextBox({ goSettings }) {
             className="textbox"
         >
             <div className="top-row">
-                {/* <input type="text" style={{ visibility: 'hidden' }} autoFocus /> */}
                 <div className="word-limits">
                     {
                         wordsLimits.current.map((len, index) => (
@@ -362,13 +366,14 @@ export default function TextBox({ goSettings }) {
             </div>
             {done && <p className="info">Press space to try again </p>}
             {/* <button onClick={goSettings}>settings</button> */}
-            {done &&
+            {/* {done &&
                 <>
                     <span>{timer.current.m}</span>
                     :
                     <span>{timer.current.s}</span>
                 </>
-            }
+            } */}
+            <input type="text" className="hidden-input" ref={hiddenInputRef} autoFocus />
             {<Typos typos={allTypos} reset={reset} />}
             {/* <div className="typos-boxes"> */}
             {/* {done && <Typos typos={mergeTypos(typos.current)} />} */}
@@ -445,4 +450,34 @@ String.prototype.shuffle = function () {
         a[j] = tmp;
     }
     return a.join("");
+}
+
+
+function sliceAt(rangePos) {
+    let end;
+    console.log(`rangePos: `, rangePos);
+    switch (rangePos) {
+        case 0: end = 500; break;
+        case 1: end = 1000; break;
+        case 2: end = 2000; break;
+        case 3: end = 3000; break;
+        case 4: end = 5000; break;
+        case 5: end = 8000; break;
+        case 6: end = 10000; break;
+        case 7: end = 14000; break;
+        case 8: end = 18000; break;
+        case 9: end = 25000; break;
+        case 10: end = 40000; break;
+        case 11: end = 80000; break;
+        case 12: end = 150000; break;
+        case 13: end = 200000; break;
+        case 14: end = 225000; break;
+        case 15: end = 250000; break;
+        case 16: end = 275000; break;
+        case 17: end = 300000; break;
+        case 18: end = 325000; break;
+        case 19: end = 350000; break;
+    }
+    console.log('end ' + end)
+    return end;
 }
