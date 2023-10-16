@@ -11,7 +11,6 @@ export default function DataProvider({ children }) {
         else
             return { ...state, [action.type]: action.payload }
     }
-    // localStorage.clear();
     const [settState, dSett] = useReducer(reducer,
         JSON.parse(
             localStorage.getItem('options')
@@ -26,6 +25,7 @@ export default function DataProvider({ children }) {
             type: 'char',
             data: "200",
             complexity: 5,
+            randoms: { char: 8, cap: 0, num: 1, sym: 0 },
         })
 
     useEffect(() => {

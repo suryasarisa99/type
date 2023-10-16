@@ -10,7 +10,7 @@ import { DataContext } from "../context/DataContext";
 import { motion } from 'framer-motion'
 import { PiArrowArcLeftFill } from 'react-icons/pi';
 import Typos from "../components/Typos";
-export default function TextBox({ goSettings, goThemes }) {
+export default function TextBox({ goSettings }) {
     const { limit, setLimit, allTypos, setAllTypos, settState: opt, mistakes, setMistakes } = useContext(DataContext)
     // localStorage.clear();
     let [arr, setArr] = useState(!opt.random ? getWords({ len: limit }) : randomWords({ len: limit }))
@@ -59,15 +59,11 @@ export default function TextBox({ goSettings, goThemes }) {
         // handle Keys
         if (e.key.length > 1) return;
         let key = e.key;
-        if (e.altKey && e.key == 'i') {
+        if (e.altKey && (e.key == 'i' || e.key == "I")) {
             goSettings();
             return;
         }
-        if (e.altKey && e.key == 'o') {
-            goThemes();
-            return;
 
-        }
         if (doneRef.current) {
             if (e.key == " ")
                 reset({});
@@ -314,14 +310,23 @@ export default function TextBox({ goSettings, goThemes }) {
         let wordLen = randomRange(opt.min, opt.max + 1);
         let randFun;
 
-        switch (opt.data) {
-            case "char": randFun = randAlpha; break;
-            case "cap": randFun = randCapAlpha; break;
-            case "num": randFun = randNum; break;
-            case "sym": randFun = randSym; break;
+        const randFuns = []
+        const randMap = { "char": randAlpha, "cap": randCapAlpha, "num": randNum, "sym": randSym }
+        for (let randType in opt.randoms) {
+
+            let i = 0;
+            while (i < opt.randoms[randType]) {
+                randFuns.push(randMap[randType])
+                i++;
+            }
         }
 
+
+        console.log(opt.randoms)
+        console.log(randFuns)
         while (word.length < wordLen) {
+            randFun = randFuns[randomRange(0, randFuns.length)]
+
             let randomValue = randFun();
             if (!opt.none.includes(randomValue))
                 word += randomValue;
@@ -349,9 +354,9 @@ export default function TextBox({ goSettings, goThemes }) {
     //* @jsx
     return (
         <motion.div
-            initial={{ y: -1000 }}
+            initial={{ y: -100 }}
             animate={{ y: 0 }}
-            exit={{ y: 1000 }}
+            exit={{ y: 100 }}
             className="textbox"
             style={{ width: limit > 80 && "95%" }}
         >
