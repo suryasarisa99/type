@@ -1,0 +1,170 @@
+:root {
+  --key-size: 30px;
+  --key-font-size: 13px;
+  --key-top-font-size: 8px;
+  --key-bt-font-size: 11px;
+  --key-special-font-size: 10px;
+  --keyboard-color: var(--background-color);
+  --key-color: var(--body-color);
+
+  --heighlight: #232323;
+  --key-text-color: #8e909b;
+  --key-hlt-border-color: #696969ac;
+  --key-hlt-text-color: #cbcbcbe1;
+  --shift-heighlight: var(--heighlight);
+  --space-heighlight: var(--heighlight);
+}
+
+@media screen and (max-width: 600px) {
+  :root {
+    --key-size: 20px;
+    --key-font-size: 11px;
+    --key-top-font-size: 6px;
+    --key-bt-font-size: 9px;
+    --key-special-font-size: 7px;
+    --keyboard-color: var(--background-color);
+    --key-color: var(--body-color);
+  }
+}
+@media screen and (min-width: 601px) and (max-width: 900px) {
+  :root {
+    --key-size: 25px;
+    --key-font-size: 11px;
+    --key-top-font-size: 6px;
+    --key-bt-font-size: 9px;
+    --key-special-font-size: 8px;
+    --keyboard-color: var(--background-color);
+    --key-color: var(--body-color);
+  }
+}
+
+.monokai {
+  //   --keyboard-color: #2c3123;
+  //   --key-color: #2c4b01;
+  //   --key-text-color: #98ed67;
+  //   --heighlight: #497807;
+  //   --space-heighlight: #386001;
+
+  --heighlight: #2a2d1d;
+  --key-text-color: #656b4c;
+  --key-hlt-border-color: #656b4c;
+  --key-hlt-text-color: #b6c08d;
+  --key-border-color: #575c46;
+  --shift-heighlight: var(--heighlight);
+  --space-heighlight: var(--heighlight);
+}
+
+.dots {
+  --heighlight: #232633;
+  --key-text-color: #727a9c;
+  --key-hlt-border-color: #575e7ead;
+  --key-hlt-text-color: #9fa8d0;
+  --shift-heighlight: var(--heighlight);
+  --space-heighlight: var(--heighlight);
+}
+
+.burgundy {
+  --keyboard-color: rgb(47, 0, 0);
+  --key-color: var(--background-color);
+  --heighlight: rgb(113, 34, 34);
+  --key-text-color: rgb(252, 156, 156);
+  --key-border-color: rgb(114, 67, 67);
+  --key-hlt-border-color: rgba(168, 105, 105, 0.777);
+  --shift-heighlight: rgb(156, 51, 51);
+  --space-heighlight: var(--shift-heighlight);
+}
+
+.keyboard-outer {
+  align-self: center;
+  margin-top: 15px;
+}
+
+.keyboard {
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  background-color: var(--keyboard-color);
+  border-radius: 6px;
+  border: 0.7px solid var(--key-border-color);
+  gap: 4px;
+  //   box-shadow: 0px 0px 8px 8px rgba(34, 34, 34, 0.379);
+
+  .row {
+    display: flex;
+    gap: 3px;
+
+    .key {
+      border-radius: 4px;
+      text-align: center;
+      background-color: var(--key-color);
+      width: var(--key-size);
+      height: var(--key-size);
+      font-size: var(--key-font-size);
+      color: var(--key-text-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      white-space: no-wrap;
+    }
+    .heighlight {
+      border: 0.7px solid var(--key-hlt-border-color);
+      color: var(--key-hlt-text-color);
+      background-color: var(--heighlight);
+    }
+    .dbl {
+      padding: 0px;
+      position: relative;
+      font-size: 12px;
+      .top {
+        position: absolute;
+        font-size: var(--key-top-font-size);
+        top: 3px;
+        left: 5px;
+      }
+      .bt {
+        font-size: var(--key-bt-font-size);
+      }
+    }
+
+    // special keys
+    .special {
+      font-size: var(--key-special-font-size);
+    }
+    .tidle {
+      width: calc(var(--key-size) * 0.7);
+    }
+    .tab {
+      width: calc(var(--key-size) * 1.35);
+    }
+    .capslock {
+      width: calc(var(--key-size) * 1.8);
+    }
+    .shift {
+      width: calc(var(--key-size) * 2.25);
+      &.heighlight {
+        background-color: var(--shift-heighlight);
+      }
+    }
+    .backspace {
+      width: fit-content;
+      flex-grow: 1;
+    }
+    .enter,
+    .right-shift {
+      flex-grow: 1;
+      &.heighlight {
+        background-color: var(--shift-heighlight);
+      }
+    }
+    .capslock,
+    .backspace {
+      font-size: calc(var(--key-special-font-size) - 2px);
+    }
+    .space {
+      flex-grow: 1;
+      &.heighlight {
+        background-color: var(--space-heighlight);
+      }
+    }
+  }
+}

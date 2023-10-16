@@ -10,6 +10,7 @@ import { DataContext } from "../context/DataContext";
 import { motion } from 'framer-motion'
 import { PiArrowArcLeftFill } from 'react-icons/pi';
 import Typos from "../components/Typos";
+import KeyBoard from '../components/KeyBoard';
 export default function TextBox({ goSettings }) {
     const { limit, setLimit, allTypos, setAllTypos, settState: opt, mistakes, setMistakes } = useContext(DataContext)
     // localStorage.clear();
@@ -23,6 +24,7 @@ export default function TextBox({ goSettings }) {
     let wordsLen = useRef(null);
     let wordsLimits = useRef([8, 15, 30, 45, 60, 80, 100, 150]);
     let mistakesRef = useRef({});
+    const [currentKey, setCurrentKey] = useState("f")
 
     const hiddenInputRef = useRef(null);
 
@@ -100,6 +102,7 @@ export default function TextBox({ goSettings }) {
 
             cc.current = 0;
             cw.current += 1;
+            setCurrentKey(arr[cw.current][cc.current]);
             console.log(words.current[cw.current]);
             chars.current = words.current[cw.current].querySelectorAll('.char');
 
@@ -117,6 +120,7 @@ export default function TextBox({ goSettings }) {
 
             cc.current += 1;
             chars.current[cc.current].classList.add("current")
+            setCurrentKey(arr[cw.current][cc.current]);
         }
 
         // * @onFalse
@@ -132,8 +136,6 @@ export default function TextBox({ goSettings }) {
             if (arr[cw.current]?.[cc.current + 1] != key && key != ' ') {
                 typos.current.push({ a: arr[cw.current][cc.current], b: key, word: arr[cw.current], index: cc.current })
                 addMistake(mistakesRef.current, arr[cw.current][cc.current])
-
-
             }
 
             const xElm = document.createElement('span');
@@ -165,6 +167,7 @@ export default function TextBox({ goSettings }) {
     useEffect(() => {
         document.addEventListener('keydown', handleKeyDown)
         document.querySelector('.char').classList.add('current')
+        setCurrentKey(arr[0][0])
         return () => {
             document.removeEventListener('keydown', handleKeyDown)
         }
@@ -322,8 +325,6 @@ export default function TextBox({ goSettings }) {
         }
 
 
-        console.log(opt.randoms)
-        console.log(randFuns)
         while (word.length < wordLen) {
             randFun = randFuns[randomRange(0, randFuns.length)]
 
@@ -389,7 +390,6 @@ export default function TextBox({ goSettings }) {
                 ))}
 
             </div>
-            {done && <p className="info">Press space to try again </p>}
             {/* <button onClick={goSettings}>settings</button> */}
             {/* {done &&
                 <>
@@ -398,7 +398,6 @@ export default function TextBox({ goSettings }) {
                     <span>{timer.current.s}</span>
                 </>
             } */}
-            <input type="text" className="hidden-input" ref={hiddenInputRef} autoFocus />
             {/* {<Typos typos={allTypos} reset={reset} />} */}
             {/* <div className="typos-boxes"> */}
             {/* {done && <Typos typos={mergeTypos(typos.current)} />} */}
@@ -410,6 +409,10 @@ export default function TextBox({ goSettings }) {
                     </div>
                 })}
             </div> */}
+            <input type="text" className="hidden-input" ref={hiddenInputRef} autoFocus />
+            <KeyBoard currentKey={currentKey} />
+            {done && <p className="info">Press space to try again </p>}
+
         </motion.div>
 
     );
