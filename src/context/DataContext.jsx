@@ -3,7 +3,7 @@ import { createContext, useState, useEffect, useReducer } from 'react'
 
 const DataContext = createContext();
 export default function DataProvider({ children }) {
-    const [limit, setLimit] = useState(JSON.parse(localStorage.getItem('limit')) || 45)
+    const [limit, setLimit] = useState(JSON.parse(localStorage.getItem('limit')) || 30)
     const [allTypos, setAllTypos] = useState(JSON.parse(localStorage.getItem('typos')) || [])
     const [mistakes, setMistakes] = useState(JSON.parse(localStorage.getItem('mistakes')) || {})
     function reducer(state, action) {
