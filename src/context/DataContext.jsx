@@ -28,6 +28,12 @@ export default function DataProvider({ children }) {
             complexity: 5,
         })
 
+    useEffect(() => {
+        document.documentElement.classList.add(
+            localStorage.getItem('theme')
+        )
+    }, [])
+
     return (
         <DataContext.Provider value={{
             limit, setLimit, allTypos, setAllTypos, settState, dSett, mistakes, setMistakes,

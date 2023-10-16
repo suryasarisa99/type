@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useContext, useCallback } from "react";
+import { render } from 'react-dom';
 import threeL from "../3l.json";
 import w200 from "../w-200.json";
 import w1000 from "../w-1000.json";
@@ -7,6 +8,7 @@ import names from "../names.json"
 import facts from "../facts.json"
 import { DataContext } from "../context/DataContext";
 import { motion } from 'framer-motion'
+import { PiArrowArcLeftFill } from 'react-icons/pi';
 import Typos from "../components/Typos";
 export default function TextBox({ goSettings, goThemes }) {
     const { limit, setLimit, allTypos, setAllTypos, settState: opt, mistakes, setMistakes } = useContext(DataContext)
@@ -19,7 +21,7 @@ export default function TextBox({ goSettings, goThemes }) {
     let chars = useRef(null);
     let charLen = useRef(null);
     let wordsLen = useRef(null);
-    let wordsLimits = useRef([8, 15, 30, 45, 60, 80, 100]);
+    let wordsLimits = useRef([8, 15, 30, 45, 60, 80, 100, 150]);
     let mistakesRef = useRef({});
 
     const hiddenInputRef = useRef(null);
@@ -85,6 +87,7 @@ export default function TextBox({ goSettings, goThemes }) {
         if (chars.current.length - 1 == cc.current) {
             chars.current[cc.current].classList.remove('current');
             chars.current[cc.current].classList.add('true')
+            prvError.current = false;
 
             // * @end
             if (cw.current == arr.length - 1 && cc.current == arr[arr.length - 1].length) {
@@ -133,13 +136,23 @@ export default function TextBox({ goSettings, goThemes }) {
             if (arr[cw.current]?.[cc.current + 1] != key && key != ' ') {
                 typos.current.push({ a: arr[cw.current][cc.current], b: key, word: arr[cw.current], index: cc.current })
                 addMistake(mistakesRef.current, arr[cw.current][cc.current])
+
+
             }
 
             const xElm = document.createElement('span');
-            xElm.textContent = key;
+            xElm.innerHTML = key;
             xElm.className = "wrong-char";
             curChar.appendChild(xElm)
 
+            if (arr[cw.current]?.[cc.current + 1] == key) {
+                const xElm = document.createElement('span');
+                const arrowIcon = <PiArrowArcLeftFill />;
+
+                render(arrowIcon, xElm); // Render the arrow icon into the span element
+                xElm.className = "wrong-arrow";
+                curChar.appendChild(xElm);
+            }
             chars.current[cc.current + 1].classList.add("current")
             cc.current += 1;
         }
@@ -333,12 +346,14 @@ export default function TextBox({ goSettings, goThemes }) {
         localStorage.setItem('typos', JSON.stringify(allTypos))
     }
 
+    //* @jsx
     return (
         <motion.div
             initial={{ y: -1000 }}
             animate={{ y: 0 }}
             exit={{ y: 1000 }}
             className="textbox"
+            style={{ width: limit > 80 && "95%" }}
         >
             <div className="top-row">
                 <div className="word-limits">
@@ -379,7 +394,7 @@ export default function TextBox({ goSettings, goThemes }) {
                 </>
             } */}
             <input type="text" className="hidden-input" ref={hiddenInputRef} autoFocus />
-            {<Typos typos={allTypos} reset={reset} />}
+            {/* {<Typos typos={allTypos} reset={reset} />} */}
             {/* <div className="typos-boxes"> */}
             {/* {done && <Typos typos={mergeTypos(typos.current)} />} */}
             {/* </div> */}

@@ -35,7 +35,6 @@
   //   rgb(111, 87, 18) 92%,
   //   rgb(69, 38, 17) 92%
   // );
-  // --background-color: #5b3217;
   // --text-color: rgb(255, 255, 255);
   // --current-char: #e16b06;
   // --current-char-bg: transparent;
@@ -104,6 +103,11 @@
   --info-color: rgba(50, 59, 103, 0.823);
   --selected-word-limit: rgb(255, 94, 0);
 }
+.arora {
+  --background-color: rgba(26, 28, 28, 0.6);
+  --body-image: linear-gradient(-20deg, #e73c7e, #23a6d5, #23d5ab);
+}
+
 @keyframes Gradient {
   0% {
     background-position: 0% 0%;
@@ -125,9 +129,8 @@ body {
   align-items: center;
   justify-content: center;
   font-family: sans-serif;
-  // background: linear-gradient(-20deg, #e73c7e, #23a6d5, #23d5ab);
-  // background-size: 400% 400%;
-  // animation: Gradient 60s ease infinite;
+  background-size: 400% 400%;
+  animation: Gradient 60s ease infinite;
 }
 .nav,
 #root,
@@ -150,25 +153,16 @@ body {
 
   .box {
     background-color: var(--background-color);
-    // background: linear-gradient(
-    //   90deg,
-    //   rgba(42, 42, 42, 0.402),
-    //   rgba(163, 163, 163, 0.364)
-    // );
-    // background-color: transparent;
-    // background: linear-gradient(-20deg, #e73c7e, #23a6d5, #23d5ab);
-    // animation: Gradient 60s ease infinite 1s;
-    background-size: 400% 400%;
-    transition: all 1s ease;
+    // background-size: 400% 400%;
+    // transition: all 1s ease;
 
     padding: 20px 20px;
     align-self: center;
     width: 100%;
     text-align: justify;
     border-radius: 8px;
-    transition: all 0.3s ease;
+    transition: all 2s ease;
     // filter: blur(2px);
-    // backdrop-filter: blur(40px);
   }
 
   .word {
@@ -179,6 +173,7 @@ body {
     white-space: nowrap;
     display: inline-block;
     margin-bottom: 6px;
+    backdrop-filter: blur(40px);
 
     div {
       display: inline-block;
@@ -230,6 +225,14 @@ body {
     left: calc(50% - 2px);
     font-size: 10px;
     color: var(--typo-char);
+  }
+  .wrong-arrow {
+    position: absolute;
+    color: var(--typo-char);
+    transform: rotate(140deg);
+    left: 11px;
+    bottom: -3px;
+    font-size: 10px;
   }
   .true {
     background-color: var(--true-char-bg);
@@ -506,5 +509,39 @@ form {
 
 // @themes
 .themes-page {
-  background-color: red;
+  .themes {
+    display: flex;
+    gap: 8px;
+    padding: 25px 35px;
+    background-color: var(--background-color);
+    // margin-top: 40px;
+    border-radius: 4px;
+
+    .theme {
+      padding: 25px 0;
+      text-align: center;
+      background-color: gray;
+      width: 100px;
+      border-radius: 4px;
+      border: 1px solid rgba(81, 81, 81, 0.633);
+    }
+
+    .burgundy {
+      background-color: #5b1a21;
+    }
+    .monokai {
+      background-color: #2f3225;
+    }
+    .dots {
+      background-color: #232533;
+    }
+    .gray {
+      background-color: #191a1c;
+    }
+    .arora {
+      background: linear-gradient(-20deg, #e73c7e, #23a6d5, #23d5ab);
+      background-size: 400% 400%;
+      animation: Gradient 60s ease infinite;
+    }
+  }
 }
