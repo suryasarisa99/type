@@ -1,5 +1,39 @@
 import { useEffect, useContext, useCallback, useState, useRef } from 'react'
 import "./kb.scss";
+
+import leftHome1 from "../images/left-home-row-1.webp"
+import leftHome2 from "../images/left-home-row-2.webp"
+import leftHome3 from "../images/left-home-row-3.webp"
+import leftHome4 from "../images/left-home-row-4.webp"
+import leftHome5 from "../images/left-home-row-5.webp"
+import leftTop1 from "../images/left-top-row-1.webp"
+import leftTop2 from "../images/left-top-row-2.webp"
+import leftTop3 from "../images/left-top-row-3.webp"
+import leftTop4 from "../images/left-top-row-4.webp"
+import leftTop5 from "../images/left-top-row-5.webp"
+import leftBottom1 from "../images/left-bottom-row-1.webp"
+import leftBottom2 from "../images/left-bottom-row-2.webp"
+import leftBottom3 from "../images/left-bottom-row-3.webp"
+import leftBottom4 from "../images/left-bottom-row-4.webp"
+import leftBottom5 from "../images/left-bottom-row-5.webp"
+import rightHome1 from "../images/right-home-row-1.webp"
+import rightHome2 from "../images/right-home-row-2.webp"
+import rightHome3 from "../images/right-home-row-3.webp"
+import rightHome4 from "../images/right-home-row-4.webp"
+import rightHome5 from "../images/right-home-row-5.webp"
+import rightTop1 from "../images/right-top-row-1.webp"
+import rightTop2 from "../images/right-top-row-2.webp"
+import rightTop3 from "../images/right-top-row-3.webp"
+import rightTop4 from "../images/right-top-row-4.webp"
+import rightTop5 from "../images/right-top-row-5.webp"
+import rightBottom1 from "../images/right-bottom-row-1.webp"
+import rightBottom2 from "../images/right-bottom-row-2.webp"
+import rightBottom3 from "../images/right-bottom-row-3.webp"
+import rightBottom4 from "../images/right-bottom-row-4.webp"
+import rightBottom5 from "../images/right-bottom-row-5.webp"
+import leftRest from "../images/left-resting-hand.webp";
+import rightRest from "../images/right-resting-hand.webp";
+import spaceHand from "../images/space.webp";
 import { AiFillWindows } from 'react-icons/ai'
 export default function KeyBoard({ currentKey }) {
 
@@ -7,33 +41,40 @@ export default function KeyBoard({ currentKey }) {
     const keysRef = useRef([]);
     const leftShiftKeyRef = useRef(null);
     const rightShiftKeyRef = useRef(null);
+    const spaceKeyRef = useRef(null);
     const prvKeyRef = useRef(null);
     const shiftLeftAphaCharsRef = useRef("AESDRBGFCTWVXQZ")
     const shiftRightAphaCharsRef = useRef("IJOPHMNKLUY")
     const shiftLeftCharsRef = useRef("~!@#$%")
     const shiftRightCharsRef = useRef("^&*()_+{}|:\"<>?")
+    const [leftHandImage, setLeftHandImage] = useState(leftTop1);
+    const [rightHandImage, setRightHandImage] = useState(rightHome5);
 
     useEffect(() => {
         const rawKeys = keyboardRef.current.querySelectorAll('.key');
         rawKeys.forEach(key => {
-            // if (key.classList.contains('dbl')) {
-            //     keysRef.current.push(key.querySelector('.top'))
-            //     keysRef.current.push(key.querySelector('.bt'))
-            // } else
             keysRef.current.push(key)
         })
         leftShiftKeyRef.current = keyboardRef.current.querySelector('.shift');
         rightShiftKeyRef.current = keyboardRef.current.querySelector('.right-shift');
+        spaceKeyRef.current = keyboardRef.current.querySelector('.space');
 
     }, [])
-
+    // localStorage.clear();
     useEffect(() => {
         console.log(`currentkey: ${currentKey}`)
         prvKeyRef.current?.classList?.remove('heighlight');
         leftShiftKeyRef.current?.classList.remove('heighlight');
         rightShiftKeyRef.current?.classList.remove('heighlight');
+        spaceKeyRef.current?.classList.remove('heighlight')
+
         console.log(keysRef.current)
-        if (currentKey == undefined) currentKey = " ";
+        if (currentKey == undefined) {
+            spaceKeyRef.current.classList.add('heighlight')
+            setRightHandImage(spaceHand);
+            setLeftHandImage(leftRest)
+            return;
+        }
         keysRef.current.forEach(key => {
             console.log(`${key} ---- ${currentKey}`)
 
@@ -42,10 +83,25 @@ export default function KeyBoard({ currentKey }) {
                 key.classList.add('heighlight')
                 prvKeyRef.current = key;
 
-                if (shiftLeftAphaCharsRef.current.includes(currentKey))
+                if (shiftLeftAphaCharsRef.current.includes(currentKey.toUpperCase())) {
+                    setLeftHandImage(leftHandKeyMap[currentKey.toLowerCase()])
+                    setRightHandImage(rightRest)
+                }
+                else if (shiftRightAphaCharsRef.current.includes(currentKey.toUpperCase())) {
+                    setRightHandImage(rightHandKeyMap[currentKey.toLowerCase()])
+                    setLeftHandImage(leftRest)
+                }
+
+
+                if (shiftLeftAphaCharsRef.current.includes(currentKey)) {
                     rightShiftKeyRef.current.classList.add('heighlight')
+                    console.log(leftHandKeyMap[currentKey.toLowerCase()])
+                }
                 else if (shiftRightAphaCharsRef.current.includes(currentKey)) {
                     leftShiftKeyRef.current.classList.add('heighlight')
+                    console.log(rightHandKeyMap[currentKey.toLowerCase()])
+                    // setHandImage(rightHandKeyMap[currentKey.toLowerCase()])
+
                 }
                 return;
             }
@@ -58,6 +114,7 @@ export default function KeyBoard({ currentKey }) {
                     prvKeyRef.current = key;
                     key.classList.add('heighlight')
                     if (shiftLeftCharsRef.current.includes(currentKey))
+
                         rightShiftKeyRef.current.classList.add('heighlight')
                     else if (shiftRightCharsRef.current.includes(currentKey))
                         leftShiftKeyRef.current.classList.add('heighlight')
@@ -66,11 +123,23 @@ export default function KeyBoard({ currentKey }) {
                 }
             }
         })
+
     }, [currentKey, keysRef.current])
 
-
+    const leftHandKeyMap = {
+        a: leftHome5, s: leftHome4, d: leftHome3, f: leftHome2, g: leftHome1,
+        q: leftTop5, w: leftTop4, e: leftTop3, r: leftTop2, t: leftTop1,
+        z: leftBottom5, x: leftBottom4, c: leftBottom3, v: leftBottom2, b: leftBottom1,
+    }
+    const rightHandKeyMap = {
+        p: rightTop5, o: rightTop4, i: rightTop3, u: rightTop2, y: rightTop1,
+        x: rightHome5, l: rightHome4, k: rightHome3, j: rightHome2, h: rightHome1,
+        '/': rightBottom5, '.': rightBottom4, ',': rightBottom3, m: rightBottom2, n: rightBottom1,
+    }
     return (
         <div className='keyboard-outer'>
+            <img src={leftHandImage} alt="" className='left-hand' />
+            <img src={rightHandImage} alt="" className='right-hand' />
             <div className="keyboard" ref={keyboardRef}>
                 <div className="row number-row">
                     <div className="key num special dbl tidle">

@@ -24,7 +24,7 @@ export default function TextBox({ goSettings }) {
     let wordsLen = useRef(null);
     let wordsLimits = useRef([8, 15, 30, 45, 60, 80, 100, 150]);
     let mistakesRef = useRef({});
-    const [currentKey, setCurrentKey] = useState("f")
+    const [currentKey, setCurrentKey] = useState()
 
     const hiddenInputRef = useRef(null);
 
