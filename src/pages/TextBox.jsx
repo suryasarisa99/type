@@ -17,6 +17,7 @@ export default function TextBox({ goSettings }) {
     let [arr, setArr] = useState(!opt.random ? getWords({ len: limit }) : randomWords({ len: limit }))
     // let [arr, setArr] = useState(randomWords(35, "char"))
     let cc = useRef(0)
+    const [resetCount, setResetCount] = useState(0);
     let cw = useRef(0)
     let words = useRef(null);
     let chars = useRef(null);
@@ -204,6 +205,7 @@ export default function TextBox({ goSettings }) {
         cw.current = 0;
         cc.current = 0;
         typos.current = [];
+        setResetCount(prv => prv + 1);
         mistakesRef.current = {};
         hiddenInputRef.current.focus();
         hiddenInputRef.current.value = ""
@@ -379,9 +381,9 @@ export default function TextBox({ goSettings }) {
 
                 {arr.map((word, ind) => (
 
-                    <div key={`${word}-x-x-${ind}`} className="word">
+                    <div key={`${word}-x-${ind}-x-${resetCount}`} className="word">
                         {word?.split('')?.map((ch, index) => {
-                            return <div key={`${word}-${ch}-${ind}-${index}`}>
+                            return <div key={`${word}-${ch}-${ind}-${index}-${reset}`}>
                                 <p className="char"> {ch}</p>
                                 {word.length - 1 == index && <span className="char ws" key={"space" + ind}> </span>}
                             </div>
@@ -410,7 +412,7 @@ export default function TextBox({ goSettings }) {
                 })}
             </div> */}
             <input type="text" className="hidden-input" ref={hiddenInputRef} autoFocus />
-            <KeyBoard currentKey={currentKey} />
+            <KeyBoard currentKey={currentKey} goSettings={goSettings} />
             {done && <p className="info">Press space to try again </p>}
 
         </motion.div>

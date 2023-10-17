@@ -178,7 +178,7 @@
     .capslock {
       width: calc(var(--key-size) * 1.8);
     }
-    .shift {
+    .left-shift {
       width: calc(var(--key-size) * 2.25);
       &.heighlight {
         background-color: var(--shift-heighlight);
