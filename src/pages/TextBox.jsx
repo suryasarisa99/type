@@ -130,6 +130,8 @@ export default function TextBox({ goSettings }) {
                 chars.current[cc.current].classList.add('again-error');
                 return;
             }
+            setCurrentKey(arr[cw.current][cc.current + 1])
+
             const curChar = chars.current[cc.current]
             curChar.classList.add('wrong');
             curChar.classList.remove('current');
@@ -353,6 +355,7 @@ export default function TextBox({ goSettings }) {
         setAllTypos([...allTypos.sort((x, y) => y.count - x.count)]);
         localStorage.setItem('typos', JSON.stringify(allTypos))
     }
+
 
     //* @jsx
     return (

@@ -205,5 +205,24 @@
         background-color: var(--space-heighlight);
       }
     }
+    .right-ctrl {
+      z-index: 3;
+      cursor: pointer;
+    }
+    .gear {
+      .gear-icon {
+        animation: rotate 0.9s linear infinite;
+      }
+    }
+  }
+}
+
+@keyframes rotate {
+  0% {
+    rotate: 0deg;
+  }
+  to {
+    rotate: 360deg;
+    scale: 2;
   }
 }

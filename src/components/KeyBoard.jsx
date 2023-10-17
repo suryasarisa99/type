@@ -1,6 +1,6 @@
 import { useEffect, useContext, useCallback, useState, useRef } from 'react'
 import "./kb.scss";
-
+import { BsGearFill } from "react-icons/bs";
 import leftHome1 from "../images/left-home-row-1.webp"
 import leftHome2 from "../images/left-home-row-2.webp"
 import leftHome3 from "../images/left-home-row-3.webp"
@@ -68,6 +68,7 @@ export default function KeyBoard({ currentKey, goSettings }) {
     const shiftRightCharsRef = useRef("^&*()_+{}|:\"<>?")
     const [leftHandImage, setLeftHandImage] = useState(leftTop1);
     const [rightHandImage, setRightHandImage] = useState(rightHome5);
+    const [showGear, setShowGear] = useState(false)
     const keysRef = useRef({});
     const n = {
         ...addAttributes(leftNum7, ["`", "`"]),
@@ -331,8 +332,18 @@ export default function KeyBoard({ currentKey, goSettings }) {
 
                     <div className="key space" value="Space"> </div>
                     <div className="key alpha special alt">Alt</div>
-
-                    <div className="key alpha special fn" onClick={goSettings}>Ctrl</div>
+                    {!showGear ?
+                        <div className="key alpha special ctrl right-ctrl" onClick={() => {
+                            setShowGear(true)
+                            setTimeout(() => {
+                                goSettings();
+                            }, 250)
+                        }}>Ctrl</div>
+                        :
+                        <div className="key gear">
+                            <BsGearFill className='gear-icon' />
+                        </div>
+                    }
                 </div>
             </div>
         </div>
