@@ -1,7 +1,7 @@
 import { useContext, useState } from 'react'
 import { DataContext } from '../context/DataContext'
 import "./empty.scss"
-export default function Empty({ goSettings, reset }) {
+export default function Empty({ goSettings, reset, len }) {
     const { dSett } = useContext(DataContext)
     const [showRefresh, setShowR] = useState(false)
     const defaultValues = {
@@ -23,18 +23,17 @@ export default function Empty({ goSettings, reset }) {
             type: '',
             payload: defaultValues
         })
-        setShowR(true);
+        reset({ len: len })
     }
     return (
         <div className='on-empty'>
             <h1>Empty</h1>
             <h4>As Per Settings 0 Words Found</h4>
             <div className="row">
-
                 <button onClick={goSettings}>Change Settings</button>
                 <p className='or'>Or</p>
                 {!showRefresh ?
-                    < button onClick={handleReset}>Reset Data Settings</button>
+                    < button onClick={handleReset}>Double click to Reset Settings</button>
                     :
                     <p className='refresh'>Refresh Now</p>
                 }

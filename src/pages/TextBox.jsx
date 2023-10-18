@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useContext, useCallback } from "react";
-import { render } from 'react-dom';
+import { hydrateRoot, createRoot } from 'react-dom';
 import threeL from "../3l.json";
 import w200 from "../w-200.json";
 import meanings from "../merge.json"
@@ -148,8 +148,8 @@ export default function TextBox({ goSettings }) {
             if (arr[cw.current]?.[cc.current + 1] == key) {
                 const xElm = document.createElement('span');
                 const arrowIcon = <PiArrowArcLeftFill />;
-
-                render(arrowIcon, xElm); // Render the arrow icon into the span element
+                const root = createRoot(xElm)
+                root.render(arrowIcon);
                 xElm.className = "wrong-arrow";
                 curChar.appendChild(xElm);
             }
@@ -169,14 +169,13 @@ export default function TextBox({ goSettings }) {
 
     useEffect(() => {
         if (arr == undefined || arr.length == 0) return;
-        console.log(arr);
         document.addEventListener('keydown', handleKeyDown)
         document.querySelector('.char').classList.add('current')
         setCurrentKey(arr[0][0])
         return () => {
             document.removeEventListener('keydown', handleKeyDown)
         }
-    }, [handleKeyDown])
+    }, [handleKeyDown, arr])
 
     const addMistake = (arr, mistake) => {
         if (mistake in arr)
@@ -205,19 +204,23 @@ export default function TextBox({ goSettings }) {
         }, 1000)
     }
     const reset = ({ len, all }) => {
-        setArr(!opt.random ? getWords({ len: len || limit, all }) : randomWords({ len: len || limit, all }))
+        console.log("called")
+        setArr(!opt.random ? getWords({ len: len || limit, all: all }) : randomWords({ len: len || limit, all: all }))
         cw.current = 0;
         cc.current = 0;
         typos.current = [];
         setResetCount(prv => prv + 1);
         mistakesRef.current = {};
-        hiddenInputRef.current.focus();
-        hiddenInputRef.current.value = ""
+        if (hiddenInputRef.current) {
+            hiddenInputRef.current.focus();
+            hiddenInputRef.current.value = "";
+        }
+
         setDone(false);
         doneRef.current = false;
         setTimeout(() => {
             words.current = document.querySelectorAll('.word');
-            chars.current = words.current[0].querySelectorAll('.char');
+            chars.current = words.current?.[0]?.querySelectorAll('.char');
             chars.current[0].classList.add('current')
         }, 300)
         timer.current = { m: 0, s: 0 }
@@ -358,7 +361,7 @@ export default function TextBox({ goSettings }) {
     }
 
     if (arr.length == 0)
-        return <Empty goSettings={goSettings} reset={reset} />
+        return <Empty goSettings={goSettings} reset={reset} len={limit} />
 
 
     //* @jsx
