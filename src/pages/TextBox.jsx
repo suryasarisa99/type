@@ -2,15 +2,14 @@ import { useState, useEffect, useRef, useContext, useCallback } from "react";
 import { render } from 'react-dom';
 import threeL from "../3l.json";
 import w200 from "../w-200.json";
-import w1000 from "../w-1000.json";
 import meanings from "../merge.json"
-import names from "../names.json"
 import facts from "../facts.json"
 import { DataContext } from "../context/DataContext";
 import { motion } from 'framer-motion'
 import { PiArrowArcLeftFill } from 'react-icons/pi';
 import Typos from "../components/Typos";
 import KeyBoard from '../components/KeyBoard';
+import Empty from "../components/Empty";
 export default function TextBox({ goSettings }) {
     const { limit, setLimit, allTypos, setAllTypos, settState: opt, mistakes, setMistakes } = useContext(DataContext)
     // localStorage.clear();
@@ -161,6 +160,7 @@ export default function TextBox({ goSettings }) {
     }, [arr])
 
     useEffect(() => {
+        if (arr == undefined || arr.length == 0) return;
         words.current = document.querySelectorAll('.word');
         chars.current = words.current[0].querySelectorAll('.char');
         wordsLen.current = arr.length;
@@ -168,6 +168,8 @@ export default function TextBox({ goSettings }) {
     }, [])
 
     useEffect(() => {
+        if (arr == undefined || arr.length == 0) return;
+        console.log(arr);
         document.addEventListener('keydown', handleKeyDown)
         document.querySelector('.char').classList.add('current')
         setCurrentKey(arr[0][0])
@@ -238,8 +240,6 @@ export default function TextBox({ goSettings }) {
         switch (opt.data) {
             case '3l': data = threeL.slice(0, sliceAt(opt.complexity)); break;
             case '200': data = w200; break;
-            case '1k': data = w1000; break;
-            case 'names': data = names; break;
             case "meanings": data = meanings; break;
             case "facts": data = facts; break;
         }
@@ -289,6 +289,7 @@ export default function TextBox({ goSettings }) {
                 randomWords = [...randomWords, ...factWords]
 
             } else {
+                if (smallWords.length == 0) return []
                 randomWords.push(smallWords[parseInt(Math.random() * limit)]);
                 i++;
             }
@@ -355,6 +356,9 @@ export default function TextBox({ goSettings }) {
         setAllTypos([...allTypos.sort((x, y) => y.count - x.count)]);
         localStorage.setItem('typos', JSON.stringify(allTypos))
     }
+
+    if (arr.length == 0)
+        return <Empty goSettings={goSettings} reset={reset} />
 
 
     //* @jsx

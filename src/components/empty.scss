@@ -1,0 +1,24 @@
+.on-empty {
+  background-color: var(--background-color);
+  border-radius: 8px;
+  padding: 40px;
+  button,
+  .refresh {
+    padding: 6px 10px;
+    background-color: var(--accent-color);
+    border: none;
+    margin-right: 8px;
+    border-radius: 6px;
+    color: rgb(159, 159, 159);
+    font-size: 11px;
+  }
+  .or {
+    // background-color: var(--accent-color);
+    font-size: 10px;
+  }
+  .row {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+}

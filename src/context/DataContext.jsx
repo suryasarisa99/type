@@ -1,6 +1,5 @@
 import { createContext, useState, useEffect, useReducer } from 'react'
 
-
 const DataContext = createContext();
 export default function DataProvider({ children }) {
     const [limit, setLimit] = useState(JSON.parse(localStorage.getItem('limit')) || 30)
