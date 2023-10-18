@@ -5,7 +5,7 @@ import { DataContext } from '../context/DataContext';
 import Themes from './Themes';
 
 export default function Settings({ back }) {
-    const { settState: opt, dSett } = useContext(DataContext)
+    const { opt, dSett } = useContext(DataContext)
 
     const [min, setMin] = useState(opt.min);
     const [max, setMax] = useState(opt.max);

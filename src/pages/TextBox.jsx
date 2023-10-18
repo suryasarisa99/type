@@ -1,20 +1,16 @@
 import { useState, useEffect, useRef, useContext, useCallback } from "react";
 import { render } from 'react-dom';
-import threeL from "../3l.json";
-import w200 from "../w-200.json";
-import w1000 from "../w-1000.json";
-import meanings from "../merge.json"
-import names from "../names.json"
-import facts from "../facts.json"
+
+// import w1000 from "../w-1000.json";
+// import names from "../names.json"
 import { DataContext } from "../context/DataContext";
 import { motion } from 'framer-motion'
 import { PiArrowArcLeftFill } from 'react-icons/pi';
 import Typos from "../components/Typos";
 import KeyBoard from '../components/KeyBoard';
 export default function TextBox({ goSettings }) {
-    const { limit, setLimit, allTypos, setAllTypos, settState: opt, mistakes, setMistakes } = useContext(DataContext)
+    const { limit, setLimit, allTypos, setAllTypos, opt, mistakes, setMistakes, getWords, arr, setArr } = useContext(DataContext)
     // localStorage.clear();
-    let [arr, setArr] = useState(!opt.random ? getWords({ len: limit }) : randomWords({ len: limit }))
     // let [arr, setArr] = useState(randomWords(35, "char"))
     let cc = useRef(0)
     const [resetCount, setResetCount] = useState(0);
@@ -161,20 +157,23 @@ export default function TextBox({ goSettings }) {
     }, [arr])
 
     useEffect(() => {
+        if (arr == undefined) return;
         words.current = document.querySelectorAll('.word');
-        chars.current = words.current[0].querySelectorAll('.char');
+        chars.current = words.current?.[0]?.querySelectorAll('.char');
         wordsLen.current = arr.length;
         // charLen.current = arr.map(w => w.length);
-    }, [])
+    }, [arr])
 
     useEffect(() => {
+        console.log(arr);
+        if (arr == undefined || arr.length == 0) return;
         document.addEventListener('keydown', handleKeyDown)
-        document.querySelector('.char').classList.add('current')
+        document.querySelector('.char')?.classList.add('current')
         setCurrentKey(arr[0][0])
         return () => {
             document.removeEventListener('keydown', handleKeyDown)
         }
-    }, [handleKeyDown])
+    }, [handleKeyDown, arr])
 
     const addMistake = (arr, mistake) => {
         if (mistake in arr)
@@ -203,7 +202,7 @@ export default function TextBox({ goSettings }) {
         }, 1000)
     }
     const reset = ({ len, all }) => {
-        setArr(!opt.random ? getWords({ len: len || limit, all }) : randomWords({ len: len || limit, all }))
+        setArr(getWords())
         cw.current = 0;
         cc.current = 0;
         typos.current = [];
@@ -233,112 +232,6 @@ export default function TextBox({ goSettings }) {
         });
         return isMatch;
     }
-    function getWords({ len, all }) {
-        let data;
-        switch (opt.data) {
-            case '3l': data = threeL.slice(0, sliceAt(opt.complexity)); break;
-            case '200': data = w200; break;
-            case '1k': data = w1000; break;
-            case 'names': data = names; break;
-            case "meanings": data = meanings; break;
-            case "facts": data = facts; break;
-        }
-        console.log(`data len: ${data.length}`)
-        let smallWords;
-        if (opt.data == 'meanings') {
-            smallWords = data.filter(word => {
-                // console.log(word);
-                return (!word.name.includes('z')
-                    && word.name.length >= opt.min
-                    && word.name.length <= opt.max
-                    && (opt.any.length > 0 ? opt.any.some(ch => word.name.includes(ch)) : true)
-                    && (all || opt.all).every(ch => word.name.includes(ch))
-                    && opt.none.every(ch => !word.name.includes(ch)))
-            }
-            )
-        } else
-            smallWords = data.filter(word =>
-                !word.includes('z')
-                && word.length >= opt.min
-                && word.length <= opt.max
-                && (opt.any.length > 0 ? opt.any.some(ch => word.includes(ch)) : true)
-                && (all || opt.all).every(ch => word.includes(ch))
-                && opt.none.every(ch => !word.includes(ch))
-            )
-        const filterFacts = facts.filter(item => item.split(' ').length <= len)
-
-        const limit = smallWords.length;
-        let i = 0;
-        let randomWords = []
-        while (i < len) {
-            if (opt.data == "meanings") {
-                let item = smallWords[parseInt(Math.random() * limit)];
-                randomWords.push(item.name + ":");
-                let words = item.text.split(' ');
-                words[words.length - 1] += "."
-                i += words.length + 1;
-                if (i > len) break;
-                randomWords = [...randomWords, ...words]
-            } else if (opt.data == "facts") {
-                console.log(`len: ${len}`);
-                // console.log(filterFacts)
-                let factWords = filterFacts[parseInt(Math.random() * filterFacts.length)].split(' ')
-                console.log(factWords)
-                i += factWords.length;
-                if (randomWords.length != 0 && i > len) break;
-                randomWords = [...randomWords, ...factWords]
-
-            } else {
-                randomWords.push(smallWords[parseInt(Math.random() * limit)]);
-                i++;
-            }
-        }
-        return randomWords;
-    }
-    function randomWords({ len, type, all }) {
-
-        let i = 0;
-        let list = []
-        while (i < len) {
-            list.push(makeWord({ type, all }))
-            i++;
-        }
-        return list;
-    }
-
-    function makeWord({ type, all }) {
-        let word = all?.join('') || opt.all.join('');
-
-        if (opt.any.length > 0) {
-            let randomIndex = randomRange(0, opt.any.length);
-            word += opt.any[randomIndex]
-        }
-
-        let wordLen = randomRange(opt.min, opt.max + 1);
-        let randFun;
-
-        const randFuns = []
-        const randMap = { "char": randAlpha, "cap": randCapAlpha, "num": randNum, "sym": randSym }
-        for (let randType in opt.randoms) {
-
-            let i = 0;
-            while (i < opt.randoms[randType]) {
-                randFuns.push(randMap[randType])
-                i++;
-            }
-        }
-
-
-        while (word.length < wordLen) {
-            randFun = randFuns[randomRange(0, randFuns.length)]
-
-            let randomValue = randFun();
-            if (!opt.none.includes(randomValue))
-                word += randomValue;
-        }
-
-        return word.shuffle();
-    }
     function addToAllTypos(typos) {
         typos.forEach(item => {
             let obj = allTypos.find(nItem => nItem.a == item.a && nItem.b == item.b)
@@ -355,6 +248,9 @@ export default function TextBox({ goSettings }) {
         setAllTypos([...allTypos.sort((x, y) => y.count - x.count)]);
         localStorage.setItem('typos', JSON.stringify(allTypos))
     }
+
+    if (arr == undefined || arr.length == 0)
+        return <h1>Empty <button onClick={goSettings}>settings</button></h1>
 
 
     //* @jsx
@@ -423,16 +319,6 @@ export default function TextBox({ goSettings }) {
     );
 }
 
-let alpha = "abcdefghijklmnopqrstuvwxy"
-let capAlpha = "ABCDEFGHIJKLMNOPQRSTUVWXY"
-let numbers = "0123456789"
-let symbols = `~!@#$%^&*-_+="':;,.<>?/()[]{}`
-
-
-const randAlpha = () => alpha[parseInt(Math.random() * alpha.length)]
-const randCapAlpha = () => capAlpha[parseInt(Math.random() * capAlpha.length)]
-const randNum = () => numbers[parseInt(Math.random() * numbers.length)]
-const randSym = () => symbols[parseInt(Math.random() * symbols.length)]
 
 
 
@@ -455,9 +341,7 @@ function mergeTypos(typos) {
 
 
 
-function randomRange(min, max) {
-    return parseInt(Math.random() * (max - min)) + min
-}
+
 
 function randomArray(len, min, max) {
     let arr = [];
@@ -486,31 +370,3 @@ String.prototype.shuffle = function () {
 }
 
 
-function sliceAt(rangePos) {
-    let end;
-    console.log(`rangePos: `, rangePos);
-    switch (rangePos) {
-        case 0: end = 500; break;
-        case 1: end = 1000; break;
-        case 2: end = 2000; break;
-        case 3: end = 3000; break;
-        case 4: end = 5000; break;
-        case 5: end = 8000; break;
-        case 6: end = 10000; break;
-        case 7: end = 14000; break;
-        case 8: end = 18000; break;
-        case 9: end = 25000; break;
-        case 10: end = 40000; break;
-        case 11: end = 80000; break;
-        case 12: end = 150000; break;
-        case 13: end = 200000; break;
-        case 14: end = 225000; break;
-        case 15: end = 250000; break;
-        case 16: end = 275000; break;
-        case 17: end = 300000; break;
-        case 18: end = 325000; break;
-        case 19: end = 350000; break;
-    }
-    console.log('end ' + end)
-    return end;
-}

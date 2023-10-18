@@ -14,7 +14,7 @@ export default function App() {
     <div className="nav">
       {!showSettings &&
         < TextBox goSettings={goSettings} />
-        // <KeyBoard />
+        // <KeyBoard goSettings={goSettings} />
       }
       {showSettings &&
         < Settings back={() => setShowSettings(false)} />
