@@ -24,6 +24,7 @@ export default function DataProvider({ children }) {
             type: 'char',
             data: "200",
             complexity: 5,
+            only: [],
             randoms: { char: 8, cap: 0, num: 1, sym: 0 },
         })
 

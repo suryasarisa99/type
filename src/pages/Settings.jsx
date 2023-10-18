@@ -13,6 +13,7 @@ export default function Settings({ back }) {
     const [any, setAny] = useState(opt.any.join(''));
     const [none, setNone] = useState(opt.none.join(''));
     const [data, setData] = useState(opt.data);
+    const [only, setOnly] = useState(opt.only.join(''));
     const [complexity, setComplexity] = useState(opt.complexity);
     let [random, setRandom] = useState(opt.random);
     let [randoms, setRandoms] = useState(opt.randoms);
@@ -89,6 +90,7 @@ export default function Settings({ back }) {
                         random,
                         complexity: +complexity,
                         randoms,
+                        only: only.split(''),
                     }
 
                     dSett({
@@ -115,17 +117,18 @@ export default function Settings({ back }) {
 
 
                             <div className="field">
-
                                 <p>Must Contain All These Characters</p>
                                 <input type="text" name="all" value={all} onChange={e => setAll(e.target.value)} />
                             </div>
 
                             <div className="field">
-
                                 <p>Contain Any one of these Character</p>
                                 <input type="text" name="any" value={any} onChange={e => setAny(e.target.value)} />
                             </div>
-
+                            <div className="field">
+                                <p>Contain only from  these Character</p>
+                                <input type="text" name="only" value={only} onChange={e => setOnly(e.target.value)} />
+                            </div>
                             <div className="field">
                                 <p>Does Not Contain Any of These</p>
                                 <input type="text" name="none" value={none} onChange={e => setNone(e.target.value)} />

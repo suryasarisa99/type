@@ -265,6 +265,7 @@ export default function TextBox({ goSettings }) {
                 && word.length >= opt.min
                 && word.length <= opt.max
                 && (opt.any.length > 0 ? opt.any.some(ch => word.includes(ch)) : true)
+                && (opt.only.length > 0 ? word.split('').every(ch => opt.only.includes(ch)) : true)
                 && (all || opt.all).every(ch => word.includes(ch))
                 && opt.none.every(ch => !word.includes(ch))
             )
@@ -320,6 +321,13 @@ export default function TextBox({ goSettings }) {
 
         let wordLen = randomRange(opt.min, opt.max + 1);
         let randFun;
+
+        if (opt.only.length != 0) {
+            while (word.length < wordLen) {
+                word += opt.only[randomRange(0, opt.only.length)]
+            }
+            return word.shuffle();
+        }
 
         const randFuns = []
         const randMap = { "char": randAlpha, "cap": randCapAlpha, "num": randNum, "sym": randSym }
