@@ -13,6 +13,21 @@
   --shift-heighlight: var(--heighlight);
   --space-heighlight: var(--heighlight);
 }
+.left-hand {
+  bottom: -130px;
+  left: -42px;
+  z-index: 2;
+  position: absolute;
+  width: calc(14 * var(--key-size) / 2 + 85px);
+}
+.right-hand {
+  position: absolute;
+  bottom: -145px;
+  right: -35px;
+
+  z-index: 2;
+  width: calc(14 * var(--key-size) / 2 + 125px);
+}
 
 @media screen and (max-width: 600px) {
   :root {
@@ -24,6 +39,17 @@
     --keyboard-color: var(--background-color);
     --key-color: var(--body-color);
   }
+
+  .left-hand {
+    left: -42px;
+    top: 0;
+    width: calc(14 * var(--key-size) / 2 + 75px);
+  }
+  .right-hand {
+    bottom: -105px;
+    right: -35px;
+    width: calc(14 * var(--key-size) / 2 + 110px);
+  }
 }
 @media screen and (min-width: 601px) and (max-width: 900px) {
   :root {
@@ -34,6 +60,16 @@
     --key-special-font-size: 8px;
     --keyboard-color: var(--background-color);
     --key-color: var(--body-color);
+  }
+  .left-hand {
+    left: -42px;
+    top: 0;
+    width: calc(14 * var(--key-size) / 2 + 75px);
+  }
+  .right-hand {
+    bottom: -120px;
+    right: -35px;
+    width: calc(14 * var(--key-size) / 2 + 115px);
   }
 }
 
@@ -80,21 +116,6 @@
   // background-color: red;
 }
 
-.left-hand {
-  bottom: -130px;
-  left: -42px;
-  z-index: 2;
-  position: absolute;
-  width: calc(14 * var(--key-size) / 2 + 85px);
-}
-.right-hand {
-  position: absolute;
-  bottom: -145px;
-  right: -35px;
-
-  z-index: 2;
-  width: calc(14 * var(--key-size) / 2 + 125px);
-}
 // .left-hand {
 //   position: absolute;
 //   width: calc(20 * var(--key-size) / 2);

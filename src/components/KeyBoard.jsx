@@ -45,6 +45,7 @@ import leftNum5 from "../images/left-num-row-5.webp";
 import leftNum4 from "../images/left-num-row-4.webp";
 import leftNum3 from "../images/left-num-row-3.webp";
 import leftNum2 from "../images/left-num-row-2.webp";
+import rightNum0 from "../images/right-num-row-0.webp";
 import rightNum1 from "../images/right-num-row-1.webp";
 import rightNum2 from "../images/right-num-row-2.webp";
 import rightNum3 from "../images/right-num-row-3.webp";
@@ -77,13 +78,13 @@ export default function KeyBoard({ currentKey, goSettings }) {
         ...addAttributes(leftNum4, ["#", "3"]),
         ...addAttributes(leftNum3, ["$", "4"]),
         ...addAttributes(leftNum2, ["%", "5"]),
-        ...addAttributes(rightNum1, ["^", "6"]),
-        ...addAttributes(rightNum2, ["&", "7"]),
-        ...addAttributes(rightNum3, ["*", "8"]),
-        ...addAttributes(rightNum4, ["(", "9"]),
-        ...addAttributes(rightNum5, [")", "0"]),
-        ...addAttributes(rightNum6, ["_", "-"]),
-        ...addAttributes(rightNum7, ["+", "="]),
+        ...addAttributes(rightNum0, ["^", "6"]),
+        ...addAttributes(rightNum1, ["&", "7"]),
+        ...addAttributes(rightNum2, ["*", "8"]),
+        ...addAttributes(rightNum3, ["(", "9"]),
+        ...addAttributes(rightNum4, [")", "0"]),
+        ...addAttributes(rightNum5, ["_", "-"]),
+        ...addAttributes(rightNum6, ["+", "="]),
         "Space": spaceHand,
         a: leftHome5, s: leftHome4, d: leftHome3, f: leftHome2, g: leftHome1,
         q: leftTop5, w: leftTop4, e: leftTop3, r: leftTop2, t: leftTop1,
