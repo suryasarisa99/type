@@ -66,6 +66,14 @@
   // keyboard
 }
 
+// scroll bar
+body {
+  scrollbar-width: 0px;
+}
+::-webkit-scrollbar {
+  display: none;
+}
+
 .monokai {
   --body-color: #171812;
   --background-color: #2f3225;
@@ -375,6 +383,7 @@ form {
   .row-sb {
     display: flex;
     gap: 15px;
+    align-items: center;
   }
   .right {
     display: flex;
@@ -388,19 +397,23 @@ form {
     padding: 3px 10px;
     margin-top: 10px;
   }
-  input {
+
+  input[type="text"],
+  input[type="range"],
+  input[type="number"] {
     background-color: var(--input-color);
     border: none;
     color: white;
     border-radius: 6px;
-    padding: 4px 5px;
-    padding-left: 18px;
+    padding: 4px 0px;
+    margin-top: 5px;
+    margin-left: 18px;
     font-size: 12px;
     &:hover {
       outline: none;
     }
   }
-  .small-input {
+  input.small-input {
     width: 50px;
     font-size: 12px;
     padding: 2px 5px;
