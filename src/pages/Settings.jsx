@@ -25,25 +25,6 @@ export default function Settings({ back }) {
     setData(e.target.value);
   }
 
-  // old way
-  function setRandomType(e) {
-    setRandom(true);
-    let value = e.target.value;
-    if (randoms.includes(value)) {
-      console.log("exists");
-      randoms = randoms.filter((item) => item != value);
-      if (randoms.length == 0) setRandom(false);
-    } else {
-      let times = { char: 12, num: 4, sym: 1, cap: 3 };
-      let i = 0;
-      while (i < times[value]) {
-        randoms.push(value);
-        i++;
-      }
-    }
-    setRandoms((prv) => [...randoms]);
-  }
-
   useEffect(() => {
     document.addEventListener("keydown", onBackSpace);
     return () => {

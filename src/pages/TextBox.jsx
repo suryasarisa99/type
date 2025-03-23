@@ -1,17 +1,15 @@
 import { useState, useEffect, useRef, useContext, useCallback } from "react";
 import { createRoot } from "react-dom/client";
-import threeL from "../3l.json";
-import w200 from "../w-200.json";
-import meanings from "../merge.json";
-import facts from "../facts.json";
+
 import { DataContext } from "../context/DataContext";
 import { motion } from "framer-motion";
 import { PiArrowArcLeftFill } from "react-icons/pi";
 import Typos from "../components/Typos";
 import KeyBoard from "../components/KeyBoard";
 import Empty from "../components/Empty";
-import speech from "speech-js";
 import { BsGearFill } from "react-icons/bs";
+import { speak } from "../utils/speak";
+import { getWords, randomWords } from "../utils/words-generate";
 
 export default function TextBox({ goSettings }) {
   const {
@@ -23,19 +21,18 @@ export default function TextBox({ goSettings }) {
     mistakes,
     setMistakes,
   } = useContext(DataContext);
-  // localStorage.clear();
+
   let [arr, setArr] = useState(
-    !opt.random ? getWords({ len: limit }) : randomWords({ len: limit })
+    !opt.random
+      ? getWords({ len: limit, opt })
+      : randomWords({ len: limit, opt })
   );
-  // let [arr, setArr] = useState(randomWords(35, "char"))
   let cc = useRef(0);
   const [resetCount, setResetCount] = useState(0);
   let cw = useRef(0);
   let words = useRef(null);
   let chars = useRef(null);
-  let charLen = useRef(null);
-  let wordsLen = useRef(null);
-  let wordsLimits = useRef([8, 15, 30, 45, 60, 80, 100, 150]);
+  let wordsLimits = useRef([8, 15, 30, 45, 60, 80, 100, 120]);
   let mistakesRef = useRef({});
   let newWord = useRef(true);
   const [currentKey, setCurrentKey] = useState();
@@ -58,23 +55,8 @@ export default function TextBox({ goSettings }) {
     localStorage.setItem("limit", val);
   };
 
-  const speak = (text) => {
-    if ("speechSynthesis" in window) {
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = "en-GB"; // Set language
-      utterance.rate = 1;
-      // Adjust speed (1.0 is normal speed)
-      speechSynthesis.speak(utterance);
-    } else {
-      console.error("Speech synthesis not supported in this browser");
-    }
-  };
-
   const handleKeyDown = useCallback(
     (e) => {
-      const nexWordFirstChar =
-        words.current?.[cw.current + 1]?.querySelector(".char");
-
       // * @backspace  <------
       if (e.key == "Backspace") {
         if (cc.current == 0) return; // prevent backspace upto a word
@@ -139,9 +121,9 @@ export default function TextBox({ goSettings }) {
             doneRef.current = true;
             clearInterval(timerRef.current);
             const seconds = timer.current.m * 60 + +timer.current.s;
-            addToAllTypos(typos.current);
             setWpm(parseInt(cw.current / (seconds / 60)));
-            mergeMistakes(mistakesRef.current);
+            // addToAllTypos(typos.current);
+            // mergeMistakes(mistakesRef.current);
             return;
           }
 
@@ -149,6 +131,8 @@ export default function TextBox({ goSettings }) {
           cw.current += 1;
           if (opt.showKeyboard) setCurrentKey(arr[cw.current][cc.current]);
           chars.current = words.current[cw.current].querySelectorAll(".char");
+          const nexWordFirstChar =
+            words.current?.[cw.current]?.querySelector(".char");
           nexWordFirstChar.classList.add("current");
         }
         return;
@@ -211,8 +195,6 @@ export default function TextBox({ goSettings }) {
     if (arr == undefined || arr.length == 0) return;
     words.current = document.querySelectorAll(".word");
     chars.current = words.current[0].querySelectorAll(".char");
-    wordsLen.current = arr.length;
-    // charLen.current = arr.map(w => w.length);
   }, []);
 
   useEffect(() => {
@@ -226,20 +208,6 @@ export default function TextBox({ goSettings }) {
     };
   }, [handleKeyDown, arr]);
 
-  const addMistake = (arr, mistake) => {
-    if (mistake in arr) arr[mistake]++;
-    else arr[mistake] = 1;
-  };
-
-  const mergeMistakes = (source) => {
-    Object.entries(source).map(([key, value]) => {
-      if (key in mistakes) mistakes[key] += value;
-      else mistakes[key] = value;
-    });
-    setMistakes({ ...mistakes });
-    localStorage.setItem("mistakes", JSON.stringify(mistakes));
-  };
-
   function startTime() {
     if (timerRef.current) clearInterval(timerRef.current);
     timerRef.current = setInterval(() => {
@@ -251,8 +219,8 @@ export default function TextBox({ goSettings }) {
   const reset = ({ len, all }) => {
     setArr(
       !opt.random
-        ? getWords({ len: len || limit, all: all })
-        : randomWords({ len: len || limit, all: all })
+        ? getWords({ len: len || limit, all: all, opt: opt })
+        : randomWords({ len: len || limit, all: all, opt })
     );
     cw.current = 0;
     cc.current = 0;
@@ -274,166 +242,9 @@ export default function TextBox({ goSettings }) {
     timer.current = { m: 0, s: 0 };
   };
 
-  function checkIndex(wi, ci) {
-    let isMatch = false; // Initialize a variable to track the match status
-    inCorrectChars.forEach((item) => {
-      if (item.word === wi && item.char === ci) {
-        isMatch = true; // Set isMatch to true if a match is found
-      }
-    });
-    return isMatch;
-  }
-  function getWords({ len, all }) {
-    let data;
-    switch (opt.data) {
-      case "3l":
-        data = threeL.slice(0, sliceAt(opt.complexity));
-        break;
-      case "200":
-        data = w200;
-        break;
-      case "meanings":
-        data = meanings;
-        break;
-      case "facts":
-        data = facts;
-        break;
-    }
-    let smallWords;
-    if (opt.data == "meanings") {
-      smallWords = data.filter((word) => {
-        // console.log(word);
-        return (
-          !word.name.includes("z") &&
-          word.name.length >= opt.min &&
-          word.name.length <= opt.max &&
-          (opt.any.length > 0
-            ? opt.any.some((ch) => word.name.includes(ch))
-            : true) &&
-          (all || opt.all).every((ch) => word.name.includes(ch)) &&
-          opt.none.every((ch) => !word.name.includes(ch))
-        );
-      });
-    } else
-      smallWords = data.filter(
-        (word) =>
-          !word.includes("z") &&
-          word.length >= opt.min &&
-          word.length <= opt.max &&
-          (opt.any.length > 0
-            ? opt.any.some((ch) => word.includes(ch))
-            : true) &&
-          (opt.only.length > 0
-            ? word.split("").every((ch) => opt.only.includes(ch))
-            : true) &&
-          (all || opt.all).every((ch) => word.includes(ch)) &&
-          opt.none.every((ch) => !word.includes(ch))
-      );
-    const filterFacts = facts.filter((item) => item.split(" ").length <= len);
-
-    const limit = smallWords.length;
-    let i = 0;
-    let randomWords = [];
-    while (i < len) {
-      if (opt.data == "meanings") {
-        let item = smallWords[parseInt(Math.random() * limit)];
-        randomWords.push(item.name + ":");
-        let words = item.text.split(" ");
-        words[words.length - 1] += ".";
-        i += words.length + 1;
-        if (i > len) break;
-        randomWords = [...randomWords, ...words];
-      } else if (opt.data == "facts") {
-        // console.log(filterFacts)
-        let factWords =
-          filterFacts[parseInt(Math.random() * filterFacts.length)].split(" ");
-        i += factWords.length;
-        if (randomWords.length != 0 && i > len) break;
-        randomWords = [...randomWords, ...factWords];
-      } else {
-        if (smallWords.length == 0) return [];
-        randomWords.push(smallWords[parseInt(Math.random() * limit)]);
-        i++;
-      }
-    }
-    return randomWords;
-  }
-  function randomWords({ len, type, all }) {
-    let i = 0;
-    let list = [];
-    while (i < len) {
-      list.push(makeWord({ type, all }));
-      i++;
-    }
-    return list;
-  }
-
-  function makeWord({ type, all }) {
-    let word = all?.join("") || opt.all.join("");
-
-    if (opt.any.length > 0) {
-      let randomIndex = randomRange(0, opt.any.length);
-      word += opt.any[randomIndex];
-    }
-
-    let wordLen = randomRange(opt.min, opt.max + 1);
-    let randFun;
-
-    if (opt.only.length != 0) {
-      while (word.length < wordLen) {
-        word += opt.only[randomRange(0, opt.only.length)];
-      }
-      return word.shuffle();
-    }
-
-    const randFuns = [];
-    const randMap = {
-      char: randAlpha,
-      cap: randCapAlpha,
-      num: randNum,
-      sym: randSym,
-    };
-    for (let randType in opt.randoms) {
-      let i = 0;
-      while (i < opt.randoms[randType]) {
-        randFuns.push(randMap[randType]);
-        i++;
-      }
-    }
-
-    while (word.length < wordLen) {
-      randFun = randFuns[randomRange(0, randFuns.length)];
-
-      let randomValue = randFun();
-      if (!opt.none.includes(randomValue)) word += randomValue;
-    }
-
-    return word.shuffle();
-  }
-  function addToAllTypos(typos) {
-    typos.forEach((item) => {
-      let obj = allTypos.find(
-        (nItem) => nItem.a == item.a && nItem.b == item.b
-      );
-      if (obj) {
-        obj.count += 1;
-        obj.items.push({ word: item.word, index: item.index });
-      } else {
-        allTypos.push({
-          a: item.a,
-          b: item.b,
-          items: [{ word: item.word, index: item.index }],
-          count: 1,
-        });
-      }
-    });
-    setAllTypos([...allTypos.sort((x, y) => y.count - x.count)]);
-    localStorage.setItem("typos", JSON.stringify(allTypos));
-  }
-
   if (arr.length == 0)
     return <Empty goSettings={goSettings} reset={reset} len={limit} />;
-  console.log("render");
+
   //* @jsx
   return (
     <motion.div
@@ -479,14 +290,11 @@ export default function TextBox({ goSettings }) {
           </div>
         ))}
       </div>
-      {/* <button onClick={goSettings}>settings</button> */}
-      {/* {done &&
-                <>
-                    <span>{timer.current.m}</span>
-                    :
-                    <span>{timer.current.s}</span>
-                </>
-            } */}
+      {/* {done && (
+        <>
+          <span>{timer.current.m}</span>:<span>{timer.current.s}</span>
+        </>
+      )} */}
       {/* {<Typos typos={allTypos} reset={reset} />} */}
       {/* <div className="typos-boxes"> */}
       {/* {done && <Typos typos={mergeTypos(typos.current)} />} */}
@@ -510,130 +318,4 @@ export default function TextBox({ goSettings }) {
       {done && <p className="info">Press space to try again </p>}
     </motion.div>
   );
-}
-
-let alpha = "abcdefghijklmnopqrstuvwxy";
-let capAlpha = "ABCDEFGHIJKLMNOPQRSTUVWXY";
-let numbers = "0123456789";
-let symbols = `~!@#$%^&*-_+="':;,.<>?/()[]{}`;
-
-const randAlpha = () => alpha[parseInt(Math.random() * alpha.length)];
-const randCapAlpha = () => capAlpha[parseInt(Math.random() * capAlpha.length)];
-const randNum = () => numbers[parseInt(Math.random() * numbers.length)];
-const randSym = () => symbols[parseInt(Math.random() * symbols.length)];
-
-function mergeTypos(typos) {
-  let arr = [];
-  typos.forEach((item) => {
-    let obj = arr.find((nItem) => nItem.a == item.a && nItem.b == item.b);
-    if (obj) {
-      obj.count += 1;
-      obj.items.push({ word: item.word, index: item.index });
-    } else {
-      arr.push({
-        a: item.a,
-        b: item.b,
-        items: [{ word: item.word, index: item.index }],
-        count: 1,
-      });
-    }
-  });
-  return arr;
-}
-
-function randomRange(min, max) {
-  return parseInt(Math.random() * (max - min)) + min;
-}
-
-function randomArray(len, min, max) {
-  let arr = [];
-  let i = 0;
-  while (i < len) {
-    let elm = parseInt(Math.random() * (max - min)) + min;
-    if (!arr.includes(elm)) {
-      arr.push(elm);
-      i++;
-    }
-  }
-  return arr;
-}
-
-String.prototype.shuffle = function () {
-  var a = this.split(""),
-    n = a.length;
-
-  for (var i = n - 1; i > 0; i--) {
-    var j = Math.floor(Math.random() * (i + 1));
-    var tmp = a[i];
-    a[i] = a[j];
-    a[j] = tmp;
-  }
-  return a.join("");
-};
-
-function sliceAt(rangePos) {
-  let end;
-  switch (rangePos) {
-    case 0:
-      end = 500;
-      break;
-    case 1:
-      end = 1000;
-      break;
-    case 2:
-      end = 2000;
-      break;
-    case 3:
-      end = 3000;
-      break;
-    case 4:
-      end = 5000;
-      break;
-    case 5:
-      end = 8000;
-      break;
-    case 6:
-      end = 10000;
-      break;
-    case 7:
-      end = 14000;
-      break;
-    case 8:
-      end = 18000;
-      break;
-    case 9:
-      end = 25000;
-      break;
-    case 10:
-      end = 40000;
-      break;
-    case 11:
-      end = 80000;
-      break;
-    case 12:
-      end = 150000;
-      break;
-    case 13:
-      end = 200000;
-      break;
-    case 14:
-      end = 225000;
-      break;
-    case 15:
-      end = 250000;
-      break;
-    case 16:
-      end = 275000;
-      break;
-    case 17:
-      end = 300000;
-      break;
-    case 18:
-      end = 325000;
-      break;
-    case 19:
-      end = 350000;
-      break;
-  }
-  return end;
 }

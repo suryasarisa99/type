@@ -184,7 +184,7 @@ body {
   .word {
     font-size: 19px;
     color: var(--text-color);
-    letter-spacing: -2.8px;
+    letter-spacing: -4.2px;
     font-family: "PT Mono";
     white-space: nowrap;
     display: inline-block;
@@ -196,9 +196,7 @@ body {
     }
   }
   .ws {
-    width: 18px;
     color: gray;
-    padding-bottom: 20px;
   }
   .char {
     padding: 3px 2.5px;
@@ -445,7 +443,7 @@ form {
     border: none;
     padding: 3px 10px;
     margin-top: 10px;
-    border-radius: px;
+    border-radius: 2px;
   }
 
   input[type="text"],
