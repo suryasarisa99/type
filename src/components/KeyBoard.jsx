@@ -1,5 +1,5 @@
 import { useEffect, useContext, useCallback, useState, useRef } from "react";
-import "./kb.scss";
+import "../styles/kb.scss";
 import { BsGearFill } from "react-icons/bs";
 import leftHome1 from "../images/left-home-row-1.webp";
 import leftHome2 from "../images/left-home-row-2.webp";

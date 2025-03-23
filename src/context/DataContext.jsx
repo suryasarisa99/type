@@ -1,4 +1,5 @@
 import { createContext, useState, useEffect, useReducer } from "react";
+import { defaultSettingsValues } from "../constants";
 
 const DataContext = createContext();
 export default function DataProvider({ children }) {
@@ -16,23 +17,10 @@ export default function DataProvider({ children }) {
     if (action.type == "") return action.payload;
     else return { ...state, [action.type]: action.payload };
   }
+
   const [settState, dSett] = useReducer(
     reducer,
-    JSON.parse(localStorage.getItem("options")) || {
-      min: 3,
-      max: 5,
-      all: [],
-      any: [],
-      none: [],
-      random: false,
-      type: "char",
-      data: "200",
-      complexity: 5,
-      only: [],
-      randoms: { char: 8, cap: 0, num: 1, sym: 0 },
-      showKeyboard: true,
-      speak: false,
-    }
+    JSON.parse(localStorage.getItem("options")) || defaultSettingsValues
   );
 
   useEffect(() => {

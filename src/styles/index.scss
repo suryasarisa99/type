@@ -8,7 +8,7 @@
   // default
   --background-color: #191a1c;
   --body-color: black;
-  --accent-color: rgb(73, 73, 73);
+  --accent-color: rgb(93, 93, 93);
   --text-color: #d6d6d6;
   --input-color: #252629;
   --current-char: rgb(103, 189, 232);
@@ -18,7 +18,7 @@
   --wrong-char: rgb(255, 80, 80);
   --wrong-char-bg: transparent;
   --typo-char: rgb(255, 0, 0);
-  --words-limit-color: rgb(175, 175, 175);
+  --words-limit-color: rgb(143, 143, 143);
   --slash-color: rgba(48, 48, 48, 0.596);
   --wpm-color: #b8b8b8;
   --info-color: rgba(58, 58, 58, 0.516);
@@ -47,7 +47,7 @@
 
 .burgundy {
   --body-color: #1a1a1a;
-  --accent-color: rgb(42, 16, 16);
+  --accent-color: rgb(149, 61, 61);
   --background-color: #5b1a21;
   --input-color: #6a2128;
   --text-color: #e3e3e3;
@@ -57,7 +57,7 @@
   --true-char-bg: transparent;
   --wrong-char: #c6262e;
   --wrong-char-bg: transparent;
-  --typo-char: rgb(85, 85, 85);
+  --typo-char: rgb(206, 134, 134);
   --words-limit-color: rgb(133, 7, 7);
   --wpm-color: #983434;
   --info-color: rgba(98, 52, 58, 0.823);
@@ -109,15 +109,19 @@ body {
   --typo-char: rgb(255, 172, 7);
   --slash-color: var(--true-char);
   --words-limit-color: #ff9552;
+  --selected-word-limit: rgb(255, 94, 0);
   --slash-color: var(--words-limit-color);
   --wpm-color: #ffd751;
   --info-color: rgba(50, 59, 103, 0.823);
-  --selected-word-limit: rgb(255, 94, 0);
 }
 .arora {
   --background-color: rgba(26, 28, 28, 0.6);
   --body-image: linear-gradient(-20deg, #e73c7e, #23a6d5, #23d5ab);
   --input-color: rgba(34, 34, 34, 0.537);
+  --words-limit-color: #dbdbdbd3;
+  --selected-word-limit: rgba(255, 255, 255, 0.78);
+  --slash-color: #c3c3c374;
+  --accent-color: rgba(206, 206, 206, 0.871);
 }
 
 @keyframes Gradient {
@@ -194,6 +198,7 @@ body {
   .ws {
     width: 18px;
     color: gray;
+    padding-bottom: 20px;
   }
   .char {
     padding: 3px 2.5px;
@@ -267,9 +272,21 @@ body {
     width: 100%;
     .box {
       border-radius: 0;
+      font-size: 14px;
+      padding: 12px;
+      .word {
+        font-size: 16px;
+      }
     }
     .word-limits {
       padding-left: 12px;
+      font-size: 14px;
+    }
+    .gear-icon-outer {
+      margin-right: 8px;
+      .gear-icon {
+        font-size: 22px;
+      }
     }
   }
 }
@@ -287,6 +304,38 @@ body {
 @media (min-width: 1000px) and (max-width: 1600px) {
   .textbox {
     width: 70%;
+  }
+}
+
+@media (max-width: 700px) {
+  form {
+    width: 85%;
+    margin: 0 auto;
+  }
+  .form-boxes {
+    flex-direction: column;
+  }
+  .back {
+    margin-top: 20px;
+    margin-left: 25px;
+    margin-bottom: 10px;
+  }
+  .theme {
+    flex-grow: 1;
+  }
+}
+@media (max-width: 400px) {
+  form {
+    width: 95%;
+    margin: 0 auto;
+  }
+  .form-boxes {
+    flex-direction: column;
+  }
+  .back {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-left: 12px;
   }
 }
 
@@ -396,6 +445,7 @@ form {
     border: none;
     padding: 3px 10px;
     margin-top: 10px;
+    border-radius: px;
   }
 
   input[type="text"],
@@ -450,6 +500,12 @@ form {
     }
   }
 }
+.gear-icon-outer {
+  margin-left: 12px;
+  .gear-icon {
+    color: var(--accent-color);
+  }
+}
 
 .word-limits {
   margin-bottom: 10px;
@@ -471,10 +527,11 @@ form {
     gap: 4px;
 
     p {
-      transition: all 0.3s ease 1s;
+      // transition: all 0.3s ease 1s;
 
       &:hover {
         cursor: pointer;
+        color: var(--selected-word-limit);
         text-decoration: underline 1px solid var(--words-limit-color);
       }
     }
@@ -486,7 +543,10 @@ form {
 
 .top-row {
   display: flex;
-  justify-content: space-between;
+  // justify-content: space-between;
+  .spacer {
+    flex-grow: 1;
+  }
 
   .wpm {
     color: var(--wpm-color);
@@ -623,37 +683,5 @@ form {
       background-size: 400% 400%;
       animation: Gradient 60s ease infinite;
     }
-  }
-}
-
-@media (max-width: 700px) {
-  form {
-    width: 85%;
-    margin: 0 auto;
-  }
-  .form-boxes {
-    flex-direction: column;
-  }
-  .back {
-    margin-top: 20px;
-    margin-left: 25px;
-    margin-bottom: 10px;
-  }
-  .theme {
-    flex-grow: 1;
-  }
-}
-@media (max-width: 400px) {
-  form {
-    width: 95%;
-    margin: 0 auto;
-  }
-  .form-boxes {
-    flex-direction: column;
-  }
-  .back {
-    margin-top: 10px;
-    margin-bottom: 10px;
-    margin-left: 12px;
   }
 }

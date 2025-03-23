@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useContext, useCallback } from "react";
-import { hydrateRoot, createRoot } from "react-dom";
+import { createRoot } from "react-dom/client";
 import threeL from "../3l.json";
 import w200 from "../w-200.json";
 import meanings from "../merge.json";
@@ -11,6 +11,7 @@ import Typos from "../components/Typos";
 import KeyBoard from "../components/KeyBoard";
 import Empty from "../components/Empty";
 import speech from "speech-js";
+import { BsGearFill } from "react-icons/bs";
 
 export default function TextBox({ goSettings }) {
   const {
@@ -71,12 +72,12 @@ export default function TextBox({ goSettings }) {
 
   const handleKeyDown = useCallback(
     (e) => {
-      const nexWordFirstchar =
+      const nexWordFirstChar =
         words.current?.[cw.current + 1]?.querySelector(".char");
 
       // * @backspace  <------
       if (e.key == "Backspace") {
-        if (cc.current == 0) return;
+        if (cc.current == 0) return; // prevent backspace upto a word
         chars.current[cc.current].classList.remove("current");
         cc.current -= 1;
         chars.current[cc.current].classList.add("current");
@@ -85,25 +86,32 @@ export default function TextBox({ goSettings }) {
         return;
       }
       // handle Keys
-      if (e.key.length > 1) return;
       let key = e.key;
-      if (e.altKey && (e.key == "i" || e.key == "I")) {
+
+      // * @settings shortcut
+      if (e.altKey && e.code == "KeyI") {
+        if (e.ctrlKey || e.metaKey) return;
         goSettings();
         return;
       }
 
+      // * return for other keys
+      if (key.length > 1 || e.altKey || e.ctrlKey || e.metaKey) {
+        return;
+      }
+
       if (doneRef.current) {
-        if (e.key == " ") reset({});
+        if (key == " ") reset({});
         return;
       }
       if (e.shiftKey) key = e.key.toUpperCase();
 
-      //* @first-Letter of pragraph
+      //* @first-Letter of paragraph
       if (cw.current == 0 && cc.current == 0) {
         startTime();
       }
 
-      // * @speack at almost end of word
+      // * @speak at almost end of word
       if (
         opt.speak &&
         newWord.current &&
@@ -114,34 +122,35 @@ export default function TextBox({ goSettings }) {
         newWord.current = false;
       }
 
-      // * @newWord or @space
+      // * @space
       if (chars.current.length - 1 == cc.current) {
-        chars.current[cc.current].classList.remove("current");
-        chars.current[cc.current].classList.add("true");
-        prvError.current = false;
-        newWord.current = true;
+        if (key == " ") {
+          chars.current[cc.current].classList.remove("current");
+          chars.current[cc.current].classList.add("true");
+          prvError.current = false;
+          newWord.current = true;
 
-        // * @end of paragraph
-        if (
-          cw.current == arr.length - 1 &&
-          cc.current == arr[arr.length - 1].length
-        ) {
-          setDone(true);
-          doneRef.current = true;
-          clearInterval(timerRef.current);
-          const seconds = timer.current.m * 60 + +timer.current.s;
-          addToAllTypos(typos.current);
-          setWpm(parseInt(cw.current / (seconds / 60)));
-          mergeMistakes(mistakesRef.current);
-          return;
+          // * @end of paragraph
+          if (
+            cw.current == arr.length - 1 &&
+            cc.current == arr[arr.length - 1].length
+          ) {
+            setDone(true);
+            doneRef.current = true;
+            clearInterval(timerRef.current);
+            const seconds = timer.current.m * 60 + +timer.current.s;
+            addToAllTypos(typos.current);
+            setWpm(parseInt(cw.current / (seconds / 60)));
+            mergeMistakes(mistakesRef.current);
+            return;
+          }
+
+          cc.current = 0;
+          cw.current += 1;
+          if (opt.showKeyboard) setCurrentKey(arr[cw.current][cc.current]);
+          chars.current = words.current[cw.current].querySelectorAll(".char");
+          nexWordFirstChar.classList.add("current");
         }
-
-        cc.current = 0;
-        cw.current += 1;
-        setCurrentKey(arr[cw.current][cc.current]);
-        chars.current = words.current[cw.current].querySelectorAll(".char");
-
-        nexWordFirstchar.classList.add("current");
         return;
       }
 
@@ -153,7 +162,7 @@ export default function TextBox({ goSettings }) {
 
         cc.current += 1;
         chars.current[cc.current].classList.add("current");
-        setCurrentKey(arr[cw.current][cc.current]);
+        if (opt.showKeyboard) setCurrentKey(arr[cw.current][cc.current]);
       }
 
       // * @onFalse
@@ -162,7 +171,7 @@ export default function TextBox({ goSettings }) {
           chars.current[cc.current].classList.add("again-error");
           return;
         }
-        setCurrentKey(arr[cw.current][cc.current + 1]);
+        if (opt.showKeyboard) setCurrentKey(arr[cw.current][cc.current + 1]);
 
         const curChar = chars.current[cc.current];
         curChar.classList.add("wrong");
@@ -175,7 +184,7 @@ export default function TextBox({ goSettings }) {
             word: arr[cw.current],
             index: cc.current,
           });
-          addMistake(mistakesRef.current, arr[cw.current][cc.current]);
+          // addMistake(mistakesRef.current, arr[cw.current][cc.current]);
         }
 
         const xElm = document.createElement("span");
@@ -424,7 +433,7 @@ export default function TextBox({ goSettings }) {
 
   if (arr.length == 0)
     return <Empty goSettings={goSettings} reset={reset} len={limit} />;
-
+  console.log("render");
   //* @jsx
   return (
     <motion.div
@@ -446,7 +455,11 @@ export default function TextBox({ goSettings }) {
             </div>
           ))}
         </div>
+        <div className="spacer"></div>
         <p className="wpm">{done && `WPM: ${wpm}`}</p>
+        <div className="gear-icon-outer" title="Alt + I">
+          <BsGearFill className="gear-icon" onClick={goSettings} />
+        </div>
       </div>
       <div className="box" ref={textBoxRef}>
         {arr.map((word, ind) => (
@@ -456,9 +469,9 @@ export default function TextBox({ goSettings }) {
                 <div key={`${word}-${ch}-${ind}-${index}-${reset}`}>
                   <p className="char"> {ch}</p>
                   {word.length - 1 == index && (
-                    <span className="char ws" key={"space" + ind}>
-                      {" "}
-                    </span>
+                    <p className="char ws" key={"space" + ind}>
+                      &nbsp;
+                    </p>
                   )}
                 </div>
               );

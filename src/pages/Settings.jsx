@@ -68,7 +68,7 @@ export default function Settings({ back }) {
       // transition={{ delay: 0.3 }}
       // whileInView={()=>{}}
     >
-      <FaChevronCircleLeft className="back" onClick={back} />
+      <FaChevronCircleLeft className="back" onClick={back} title="Escape" />
 
       <div className="forms">
         <form

@@ -1,0 +1,15 @@
+export const defaultSettingsValues = {
+  min: 3,
+  max: 5,
+  all: [],
+  any: [],
+  none: [],
+  random: false,
+  type: "char",
+  data: "200",
+  complexity: 5,
+  only: [],
+  randoms: { char: 8, cap: 0, num: 0, sym: 0 },
+  showKeyboard: true,
+  speak: false,
+};
